@@ -17,33 +17,37 @@ clm_dataframe = pd.read_csv("source-files/CLIMATEDATA.csv")
 ghg_dataframe = pd.read_csv("source-files/GREENHOUSEGASDATA.csv")
 
 # climate data base lists
-df_area_list = clm_dataframe['Area'].unique() # 247 unique areas
-df_year_list = clm_dataframe['Year'].unique() # 60 unique years
-df_months_list = clm_dataframe['Months'].unique() # 17 unique months (12 standard, 4 seasons, 1 meteorological year)
+df_country_list = clm_dataframe['country'].unique() # 247 unique countries
+df_year_list = clm_dataframe['year'].unique() # 60 unique years
+df_months_list = clm_dataframe['months'].unique() # 17 unique months (12 standard, 4 seasons, 1 meteorological year)
 
-# climate data; limited to meteorological month with random area as line graph
-def climate_data_random_single_area_in_metereological_month_over_year_as_line():
-    random_area = np.random.randint((len(df_area_list) - 1), size=1)[0]
-    np_area_select = df_area_list[random_area]
-    df = clm_dataframe.query("`Area` == @np_area_select and `Months Code` == 7020")
-    fig = px.line(df, x="Year", y="Value", title=f"Temperature change over time in {np_area_select}")
+# climate data; limited to meteorological month with random country as line graph
+def climate_data_random_single_country_in_metereological_month_over_year_as_line():
+    random_country = np.random.randint((len(df_country_list) - 1), size=1)[0]
+    np_country_select = df_country_list[random_country]
+    df = clm_dataframe.query("`country` == @np_country_select and `months_code` == 7020")
+    fig = px.line(df, x="year", y="value", title=f"Temperature change over time in {np_country_select}")
     fig.show()
 
-# climate data; limited to meteorological month with random area as bar graph
-def climate_data_random_single_area_in_metereological_month_over_year_as_bar():
-    random_area = np.random.randint((len(df_area_list) - 1), size=1)[0]
-    np_area_select = df_area_list[random_area]
-    df = clm_dataframe.query("`Area` == @np_area_select and `Months Code` == 7020")
-    fig = px.bar(df, x="Year", y="Value", title=f"Temperature change over time in {np_area_select}")
+# climate data; limited to meteorological month with random country as bar graph
+def climate_data_random_single_country_in_metereological_month_over_year_as_bar():
+    random_country = np.random.randint((len(df_country_list) - 1), size=1)[0]
+    np_country_select = df_country_list[random_country]
+    df = clm_dataframe.query("`country` == @np_country_select and `months_code` == 7020")
+    fig = px.bar(df, x="year", y="value", title=f"Temperature change over time in {np_country_select}")
     fig.show()
 
-# climate data; all months with random area as box graph
-def climate_data_random_single_area_in_month_over_year_as_box():
-    random_area = np.random.randint((len(df_area_list) - 1), size=1)[0]
-    np_area_select = df_area_list[random_area]
-    df = clm_dataframe.query("`Area` == @np_area_select")
-    fig = px.box(df, x="Year", y="Value", title=f"Temperature change over time in {np_area_select}")
+# climate data; all months with random country as box graph
+def climate_data_random_single_country_in_month_over_year_as_box():
+    random_country = np.random.randint((len(df_country_list) - 1), size=1)[0]
+    np_country_select = df_country_list[random_country]
+    df = clm_dataframe.query("`country` == @np_country_select")
+    fig = px.box(df, x="year", y="value", title=f"Temperature change over time in {np_country_select}")
     fig.show()
+
+def climate_and_ghg_single_country():
+    clm1 = pd.DataFrame(clm_dataframe)
+    ghg1 = pd.DataFrame(ghg_dataframe)
 
 def function2(): return
 def function3(): return
@@ -103,7 +107,13 @@ def read_greenhouse_gas_data_csv():
     #fig3 = px.line(df, x='year', y='nitrous_oxide', title=f"Nitrous Oxide output per year in {random_country}.")
     #fig3.show()
 
+
 if __name__ == '__main__':
     library_version()
     #read_climate_data_csv()
-    read_greenhouse_gas_data_csv()
+    #read_greenhouse_gas_data_csv()
+
+    #climate_data_random_single_country_in_metereological_month_over_year_as_line()
+    #climate_data_random_single_country_in_metereological_month_over_year_as_bar()
+    #climate_data_random_single_country_in_month_over_year_as_box()
+    climate_and_ghg_single_country()
