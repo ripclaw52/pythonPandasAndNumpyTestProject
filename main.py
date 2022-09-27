@@ -1,39 +1,25 @@
 import numpy as np
 import pandas as pd
+import plotly as po
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-CLM_DATA_COLUMNS = [
-    'Domain Code',
-    'Domain',
-    'Area Code (FAO)',
-    'Element Code',
-    'Element',
-    'Year Code',
-    'Flag Description'
-]
-GHG_DATA_COLUMNS = []
-PANDAS_SELECTION = {
-    0 : "default",
-    1 : "head",
-    2 : "tail",
-    3 : "info"
-}
+# Display version for imported libraries
 def library_version():
     print(f"numpy version: {np.__version__}\n"
-          f"pandas version: {pd.__version__}")
-def pandas_selection_input():
-    while True:
-        var = input(f"Enter a value from {PANDAS_SELECTION}: ")
-        try:
-            var = int(var)
-            if var in PANDAS_SELECTION.keys():
-                return var
-            else:
-                print(f"{var} isn't in {PANDAS_SELECTION.keys()}.")
-        except:
-            print(f"input type:{type(var)} is not matching type:{type(list(PANDAS_SELECTION.keys())[0])}.")
+          f"pandas version: {pd.__version__}\n"
+          f"plotly version: {po.__version__}")
+
+# TEMPERATURE_CHANGE data csv file as dataframe
+clm_dataframe = pd.read_csv("source-files/CLIMATEDATA.csv")
+# GREENHOUSE-GAS data csv file as dataframe
+ghg_dataframe = pd.read_csv("source-files/GREENHOUSEGASDATA.csv")
+
+
+def function1(): return
+def function2(): return
+def function3(): return
 
 def read_climate_data_csv():
     #print("Reading climate data")
@@ -63,17 +49,6 @@ def read_climate_data_csv():
     #fig = px.bar(df, x="Months", y="Value", facet_row="Area", facet_col="Year")
     fig = px.box(df, x="Year", y="Value", color="Area", title=f"Temperature  change for {np_area_select} over time", range_y=[-9.5, 12.5])
     fig.show()
-    '''
-    input_string = pandas_selection_input()
-    if input_string.__eq__(1):
-        print(df.head())
-    elif input_string.__eq__(2):
-        print(df.tail())
-    elif input_string.__eq__(3):
-        print(df.info())
-    else:
-        print(df)
-    '''
 
 def read_greenhouse_gas_data_csv():
     #print("Reading greenhouse gas data")
@@ -100,19 +75,6 @@ def read_greenhouse_gas_data_csv():
     #fig2.show()
     #fig3 = px.line(df, x='year', y='nitrous_oxide', title=f"Nitrous Oxide output per year in {random_country}.")
     #fig3.show()
-
-    '''
-    #df.drop(GHG_DATA_COLUMNS, inplace=True, axis=1)
-    input_string = pandas_selection_input()
-    if input_string.__eq__(1):
-        print(df.head())
-    elif input_string.__eq__(2):
-        print(df.tail())
-    elif input_string.__eq__(3):
-        print(df.info())
-    else:
-        print(df)
-    '''
 
 if __name__ == '__main__':
     library_version()
