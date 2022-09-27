@@ -16,8 +16,35 @@ clm_dataframe = pd.read_csv("source-files/CLIMATEDATA.csv")
 # GREENHOUSE-GAS data csv file as dataframe
 ghg_dataframe = pd.read_csv("source-files/GREENHOUSEGASDATA.csv")
 
+# climate data base lists
+df_area_list = clm_dataframe['Area'].unique() # 247 unique areas
+df_year_list = clm_dataframe['Year'].unique() # 60 unique years
+df_months_list = clm_dataframe['Months'].unique() # 17 unique months (12 standard, 4 seasons, 1 meteorological year)
 
-def function1(): return
+# climate data; limited to meteorological month with random area as line graph
+def climate_data_random_single_area_in_metereological_month_over_year_as_line():
+    random_area = np.random.randint((len(df_area_list) - 1), size=1)[0]
+    np_area_select = df_area_list[random_area]
+    df = clm_dataframe.query("`Area` == @np_area_select and `Months Code` == 7020")
+    fig = px.line(df, x="Year", y="Value", title=f"Temperature change over time in {np_area_select}")
+    fig.show()
+
+# climate data; limited to meteorological month with random area as bar graph
+def climate_data_random_single_area_in_metereological_month_over_year_as_bar():
+    random_area = np.random.randint((len(df_area_list) - 1), size=1)[0]
+    np_area_select = df_area_list[random_area]
+    df = clm_dataframe.query("`Area` == @np_area_select and `Months Code` == 7020")
+    fig = px.bar(df, x="Year", y="Value", title=f"Temperature change over time in {np_area_select}")
+    fig.show()
+
+# climate data; all months with random area as box graph
+def climate_data_random_single_area_in_month_over_year_as_box():
+    random_area = np.random.randint((len(df_area_list) - 1), size=1)[0]
+    np_area_select = df_area_list[random_area]
+    df = clm_dataframe.query("`Area` == @np_area_select")
+    fig = px.box(df, x="Year", y="Value", title=f"Temperature change over time in {np_area_select}")
+    fig.show()
+
 def function2(): return
 def function3(): return
 
