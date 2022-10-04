@@ -33,6 +33,7 @@ df_continents = ["Africa", "Asia", "Europe", "North America", "South America"]
 def climate_data_random_single_country_in_metereological_month_over_year():
     var_size = 1
     random_country = np.random.randint((len(df_country_list) - 1), size=var_size)[0]
+    #random_country = 37 #Canada
     np_country_select = df_country_list[random_country]
     df = clm_dataframe.query("`country` == @np_country_select and `months_code` == 7020")
     fig = px.line(df, x="year", y="value")
@@ -54,6 +55,7 @@ def climate_data_random_single_country_in_metereological_month_over_year():
 def climate_data_in_month_over_year_as_box():
     var_size = 1
     random_country = np.random.randint((len(df_country_list) - 1), size=var_size)[0]
+    #random_country = 37 #Canada
     np_country_select = df_country_list[random_country]
     df = clm_dataframe.query("`country` == @np_country_select")
     fig = px.box(df, x="year", y="value")
@@ -72,8 +74,12 @@ def climate_data_in_month_over_year_as_box():
 
 # climate data as 3d line graph with values by year and month
 def climate_data_3d_line():
+    m_color = ["red", "grey", "grey", "grey",
+               "grey", "grey", "grey", "grey",
+               "grey", "grey", "grey", "grey"]
     var_size = 1
     random_country = np.random.randint((len(df_country_list) - 1), size=var_size)[0]
+    #random_country = 37 #Canada
     np_country_select = df_country_list[random_country]
     df = clm_dataframe.query("`country`==@np_country_select and `months_code`<=7012")
     fig = px.line_3d(df,
@@ -82,10 +88,24 @@ def climate_data_3d_line():
                      z='value',
                      line_group='months',
                      color='months',
-                     )
+                     color_discrete_map={
+                         "January": f'{m_color[0]}',
+                         "February": f'{m_color[1]}',
+                         "March": f'{m_color[2]}',
+                         "April": f'{m_color[3]}',
+                         "May": f'{m_color[4]}',
+                         "June": f'{m_color[5]}',
+                         "July": f'{m_color[6]}',
+                         "August": f'{m_color[7]}',
+                         "September": f'{m_color[8]}',
+                         "October": f'{m_color[9]}',
+                         "November": f'{m_color[10]}',
+                         "December": f'{m_color[11]}',
+                     },
+    )
     fig.update_layout(
         title=f"Temperature change for each month by year in {np_country_select}",
-        scene_camera = dict(eye=dict(x=-1.35, y=-1.35, z=0.35))
+        scene_camera = dict(eye=dict(x=-1.35, y=-1.35, z=0.35)),
     )
     fig.update_scenes(
         xaxis=dict(
@@ -105,6 +125,7 @@ def climate_data_3d_line():
 def ghg_emissions_random_country():
     var_size = 1
     random_country = np.random.randint((len(ghg_country_list) - 1), size=var_size)[0]
+    #random_country = 36 #Canada
     np_country_select = ghg_country_list[random_country]
     df = ghg_dataframe.query("`country` == @np_country_select")
 
