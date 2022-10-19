@@ -3,6 +3,10 @@ import numpy as np
 import pandas as pd
 import plotly as po
 import plotly.express as px
+import dash
+import requests
+import sodapy
+from sodapy import Socrata
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
@@ -10,13 +14,17 @@ from plotly.subplots import make_subplots
 def library_version():
     print(f"numpy version: {np.__version__}\n"
           f"pandas version: {pd.__version__}\n"
-          f"plotly version: {po.__version__}")
+          f"plotly version: {po.__version__}\n"
+          f"dash version: {dash.__version__}\n"
+          f"request version: {requests.__version__}\n"
+          f"sodapy version: {sodapy.__version__}")
 
-# https://data.edmonton.ca/resource/q7d6-ambg.json
+#JSON API data https://data.edmonton.ca/resource/q7d6-ambg.json
 
 LANG_CENSUS_DF = pd.read_csv("source-files/2016_Census_-_Dwelling_Unit_by_Language__Neighbourhood_Ward_.csv")
 #CRIME_OCCUR_DF = pd.read_csv("source-files/Occurrences_Last_90_Days.csv")
-PRPRT_ASSES_DF = pd.read_csv("source-files/Property_Assessment_Data_2022.csv")
+#PRPRT_ASSES_DF = pd.read_csv("source-files/Property_Assessment_Data_2022.csv")
+PRPRT_ASSES_DF = pd.read_csv("source-files/Property_Assessment_Data__Current_Calendar_Year_.csv")
 
 WARDS_2021 = {
      1: "Nakota Isga Ward",
@@ -546,9 +554,116 @@ def read_property_assessment_mapbox(input):
     )
     fig.show()
 
-def read_lc():
-    return
+def property_assessment_data_all_neighbourhoods():
+    residential = "RESIDENTIAL"
+    df = PRPRT_ASSES_DF.query("`Assessment Class % 1`==100 & `Assessment Class 1`==@residential")
+    fig = px.box(df,
+                 x=df['Neighbourhood'],
+                 y=df['Assessed Value'],
+                 color=df["Ward"],
+                 points=False,
+                 title="Assessed values of residential properties in the city of Edmonton.",
+                 )
+    fig.show()
 
+'''
+FIVE Neighbourhoods with highest valued outliers
+FIVE Neighbourhoods with highest valued medians
+'''
+class HoodStats:
+    def __init__(self, hood, mean, median, count):
+        self.hood = hood
+        self.mean = mean
+        self.median = median
+        self.count = count
+    def __repr__(self):
+        return '{' + self.hood + ', ' + str(self.mean) + ', ' + str(self.median) + ', ' + str(self.count) + '}'
+
+def get_median_of_each_neighbourhood():
+    residential = "RESIDENTIAL"
+    normal_neighbourhood = PRPRT_ASSES_DF["Neighbourhood"].unique()
+    df = PRPRT_ASSES_DF.query("`Assessment Class % 1`==100 & `Assessment Class 1`==@residential")[['Neighbourhood','Assessed Value']]
+    unique_neighbourhood = df["Neighbourhood"].unique()
+    #print(len(normal_neighbourhood)) #402
+    #print(len(unique_neighbourhood)) #345
+    '''
+    test_hood = df.query("Neighbourhood == @unique_neighbourhood[0]")
+    count = test_hood["Assessed Value"]
+    median = np.median(test_hood["Assessed Value"])
+    mean = np.mean(test_hood["Assessed Value"])
+    print(f"{unique_neighbourhood[0]} ==> count:{count}\t\tmedian:{median}\t\tmean:{mean}")
+    '''
+    hood_list = []
+    for hood in unique_neighbourhood:
+        temp_df = df.query("Neighbourhood == @hood")
+        value_list = temp_df["Assessed Value"]
+        mean = np.mean(value_list)
+        median = np.median(value_list)
+        count = len(value_list)
+        hood_list.append( HoodStats(hood, mean, median, count) )
+
+    avg_listings = []
+    for lists in hood_list:
+        if lists.count >= 50:
+            avg_listings.append(lists)
+
+    #print( len(avg_listings) )
+    hlist = sorted(avg_listings, key=lambda x: x.median, reverse=True)
+    llist = sorted(avg_listings, key=lambda x: x.median)
+    print(f"High: {hlist[:5]}")
+    print(f"Low: {llist[:5]}")
+    #return avg_listings
+
+HIGH = [{"name" : "WINDSOR PARK","mean" : 1136973.8175675676,"median" : 971500.0,"count" : 592},
+        {"name" : "WESTBROOK ESTATES","mean" : 1178412.912912913,"median" : 963500.0,"count" : 333},
+        {"name" : "RIVERVIEW AREA","mean" : 870414.8148148148,"median" : 812500.0,"count" : 135},
+        {"name" : "GRANDVIEW HEIGHTS","mean" : 868951.4435695538,"median" : 809500.0,"count" : 381},
+        {"name" : "HAYS RIDGE AREA","mean" : 721913.7931034482,"median" : 761500.0,"count" : 406}]
+
+LOW = [{"name" : "RIVER VALLEY HERMITAGE","mean" : 75950.79365079365,"median" : 8000.0,"count" : 315},
+       {"name" : "BARANOW","mean" : 97819.09885675857,"median" : 10000.0,"count" : 1487},
+       {"name" : "MAPLE RIDGE","mean" : 48548.578199052135,"median" : 34500.0,"count" : 844},
+       {"name" : "EVERGREEN","mean" : 41790.22556390977,"median" : 36000.0,"count" : 665},
+       {"name" : "WESTVIEW VILLAGE","mean" : 49357.75047258979,"median" : 42500.0,"count" : 1058}]
+
+
+def display_story_box():
+    combined = []
+    for lo in LOW:
+        combined.append(lo.get("name"))
+    for hi in HIGH:
+        combined.append(hi.get("name"))
+    df = PRPRT_ASSES_DF.query("`Assessment Class % 1`==100 &"
+                              "`Assessment Class 1`=='RESIDENTIAL' &"
+                              "`Neighbourhood`==@combined")
+    fig = px.box(df,
+                 y=df["Neighbourhood"],
+                 x=df["Assessed Value"],
+                 points=False,
+                 )
+    fig.show()
+
+def display_story_histogram():
+    combined = []
+    for lo in LOW:
+        combined.append(lo.get("name"))
+    for hi in HIGH:
+        combined.append(hi.get("name"))
+    df = PRPRT_ASSES_DF.query("`Assessment Class % 1`==100 &"
+                              "`Assessment Class 1`=='RESIDENTIAL' &"
+                              "`Neighbourhood`==@combined")
+    fig = px.histogram(df,
+                       y=df["Neighbourhood"],
+                       x=df["Assessed Value"],
+                       barmode='group',
+                       histfunc='avg',
+                 )
+    fig.show()
 
 if __name__ == '__main__':
     library_version()
+    #property_assessment_data_all_neighbourhoods()
+    #get_median_of_each_neighbourhood()
+
+    display_story_box()
+    display_story_histogram()
