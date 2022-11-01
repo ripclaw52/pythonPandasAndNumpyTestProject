@@ -1,0 +1,71 @@
+==============================
+Disorder:
+ -> Mischief/Graffiti:
+	['Mischief - Property' 'Public Mischief' 'Graffiti']
+
+ -> Disputes/Disturbances:
+	['Disturbance' 'Dispute']
+
+ -> General Disorder:
+	['Trouble with Person' 'Suspicious Person' 'Trespassing'
+ 'Suspicious Vehicle']
+
+ -> Provincial Statute Violations:
+	['Intoxicated Person']
+
+
+==============================
+Non-Violent:
+ -> Property:
+	['Break and Enter Commercial' 'Theft Under $5000' 'Theft Over $5000'
+ 'Internet Fraud' 'Break and Enter Residential' 'Fraud - Financial'
+ 'Theft of Motor Vehicle' 'Possession Stolen Property' 'Fraud General'
+ 'Fraud Personal' 'Fire Arson' 'Property Damage'
+ 'Technology/Internet Crime']
+
+ -> Abandoned/Recovered/Seized Vehicles:
+	['Recovered Motor Vehicle' 'Abandoned Vehicle']
+
+ -> Counterfeiting/Gaming and Betting:
+	['Counterfeit Money']
+
+
+==============================
+Violent:
+ -> Personal Violence:
+	['Assault' 'Robbery Personal' 'Robbery Commercial' 'Homicide']
+
+ -> Sexual Violations:
+	['Indecent Act']
+
+
+==============================
+Traffic:
+ -> Criminal Flights/Impaired Operation/Escape Lawful :
+	['Impaired Driving' 'Criminal Flight Event']
+
+
+==============================
+Weapons:
+ -> Weapons Violations:
+	['Weapons Complaint' 'Weapons Complaint Firearm']
+
+ -> Explosives/Dangerous Goods:
+	['Dangerous Condition' 'Bomb Threat']
+
+
+==============================
+Drugs:
+ -> Drug Violations:
+	['Drugs']
+
+
+==============================
+Other:
+ -> Provincial Statute Violations:
+	['Liquor Act']
+
+ -> Workplace/Labour Violations:
+	['Workplace Accident']
+
+

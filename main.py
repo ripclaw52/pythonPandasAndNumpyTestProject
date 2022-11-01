@@ -22,7 +22,7 @@ def library_version():
 #JSON API data https://data.edmonton.ca/resource/q7d6-ambg.json
 
 LANG_CENSUS_DF = pd.read_csv("source-files/2016_Census_-_Dwelling_Unit_by_Language__Neighbourhood_Ward_.csv")
-#CRIME_OCCUR_DF = pd.read_csv("source-files/Occurrences_Last_90_Days.csv")
+CRIME_OCCUR_DF = pd.read_csv("source-files/Occurrences_Last_90_Days.csv")
 #PRPRT_ASSES_DF = pd.read_csv("source-files/Property_Assessment_Data_2022.csv")
 PRPRT_ASSES_DF = pd.read_csv("source-files/Property_Assessment_Data__Current_Calendar_Year_.csv")
 
@@ -582,6 +582,7 @@ class HoodStats:
 def get_median_of_each_neighbourhood():
     residential = "RESIDENTIAL"
     normal_neighbourhood = PRPRT_ASSES_DF["Neighbourhood"].unique()
+    #print( len(normal_neighbourhood) )
     df = PRPRT_ASSES_DF.query("`Assessment Class % 1`==100 & `Assessment Class 1`==@residential")[['Neighbourhood','Assessed Value']]
     unique_neighbourhood = df["Neighbourhood"].unique()
     #print(len(normal_neighbourhood)) #402
@@ -605,45 +606,259 @@ def get_median_of_each_neighbourhood():
     avg_listings = []
     for lists in hood_list:
         if lists.count >= 50:
-            avg_listings.append(lists)
+            avg_listings.append( lists )
 
-    #print( len(avg_listings) )
-    hlist = sorted(avg_listings, key=lambda x: x.median, reverse=True)
-    llist = sorted(avg_listings, key=lambda x: x.median)
-    print(f"High: {hlist[:5]}")
-    print(f"Low: {llist[:5]}")
-    #return avg_listings
+    #print( len(avg_listings) ) #280
+    #hlist = sorted(avg_listings, key=lambda x: x.median, reverse=True)
+    #llist = sorted(avg_listings, key=lambda x: x.median)
+    #print(f"High: {hlist[:5]}")
+    #print(f"Low: {llist[:5]}")
+    return avg_listings
 
 HIGH = [{"name" : "WINDSOR PARK","mean" : 1136973.8175675676,"median" : 971500.0,"count" : 592},
         {"name" : "WESTBROOK ESTATES","mean" : 1178412.912912913,"median" : 963500.0,"count" : 333},
-        {"name" : "RIVERVIEW AREA","mean" : 870414.8148148148,"median" : 812500.0,"count" : 135},
-        {"name" : "GRANDVIEW HEIGHTS","mean" : 868951.4435695538,"median" : 809500.0,"count" : 381},
-        {"name" : "HAYS RIDGE AREA","mean" : 721913.7931034482,"median" : 761500.0,"count" : 406}]
-
+        {"name" : "RIVERVIEW AREA","mean" : 870414.8148148148,"median" : 812500.0,"count" : 135},]
+        #{"name" : "GRANDVIEW HEIGHTS","mean" : 868951.4435695538,"median" : 809500.0,"count" : 381},
+        #{"name" : "HAYS RIDGE AREA","mean" : 721913.7931034482,"median" : 761500.0,"count" : 406}]
 LOW = [{"name" : "RIVER VALLEY HERMITAGE","mean" : 75950.79365079365,"median" : 8000.0,"count" : 315},
        {"name" : "BARANOW","mean" : 97819.09885675857,"median" : 10000.0,"count" : 1487},
-       {"name" : "MAPLE RIDGE","mean" : 48548.578199052135,"median" : 34500.0,"count" : 844},
-       {"name" : "EVERGREEN","mean" : 41790.22556390977,"median" : 36000.0,"count" : 665},
-       {"name" : "WESTVIEW VILLAGE","mean" : 49357.75047258979,"median" : 42500.0,"count" : 1058}]
+       {"name" : "MAPLE RIDGE","mean" : 48548.578199052135,"median" : 34500.0,"count" : 844},]
+       #{"name" : "EVERGREEN","mean" : 41790.22556390977,"median" : 36000.0,"count" : 665},
+       #{"name" : "WESTVIEW VILLAGE","mean" : 49357.75047258979,"median" : 42500.0,"count" : 1058}]
 
 
-def display_story_box():
+def display_story_hood_amount_(list):
+    colors1 = '#5A8AA2'
+    colors2 = '#C8C7C7'
+    #colors = ['#C8C7C7',]*8
+    #colors[2] = '#31566F'
+
+    intervals = ["Less than 200K", "200K - 300K", "300K - 400K", "400K - 500K",
+                 "500K - 600K", "600K - 700K", "700K - 800K", "More than 800K"]
+    median = [0, 0, 0, 0,
+             0, 0, 0, 0]
+    mean = [0, 0, 0, 0,
+              0, 0, 0, 0]
+    for key in list:
+        if (key.median < 200000):
+            median[0] += 1
+        elif (300000 > key.median >= 200000):
+            median[1] += 1
+        elif (400000 > key.median >= 300000):
+            median[2] += 1
+        elif (500000 > key.median >= 400000):
+            median[3] += 1
+        elif (600000 > key.median >= 500000):
+            median[4] += 1
+        elif (700000 > key.median >= 600000):
+            median[5] += 1
+        elif (800000 > key.median >= 700000):
+            median[6] += 1
+        else:
+            median[7] += 1
+    for key in list:
+        if (key.mean < 200000):
+            mean[0] += 1
+        elif (300000 > key.mean >= 200000):
+            mean[1] += 1
+        elif (400000 > key.mean >= 300000):
+            mean[2] += 1
+        elif (500000 > key.mean >= 400000):
+            mean[3] += 1
+        elif (600000 > key.mean >= 500000):
+            mean[4] += 1
+        elif (700000 > key.mean >= 600000):
+            mean[5] += 1
+        elif (800000 > key.mean >= 700000):
+            mean[6] += 1
+        else:
+            mean[7] += 1
+
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        y=median,
+        x=intervals,
+        text=median,
+        name="Median",
+        marker_color = colors1,
+    ))
+    fig.add_trace(go.Bar(
+        y=mean,
+        x=intervals,
+        text=mean,
+        name="Mean",
+        marker_color = colors2,
+    ))
+    fig.update_traces(
+        textfont_size=24,
+        textangle=0,
+        textposition="outside",
+        cliponaxis=False,
+    )
+    fig.update_layout(
+        hoverdistance=-1,
+        hovermode="x unified",
+        title="Distribution of Average Assessed Values per Neighbourhood in the City of Edmonton",
+        template="plotly_white",
+        legend=dict(
+            orientation="h",
+            yanchor="top",
+            y=1.02,
+            xanchor="right",
+            x=0.85,
+            traceorder="normal",
+            font=dict(
+                size=16,
+                family="sans-serif",
+                color=colors1,
+            ),
+        ),
+        yaxis=dict(
+            showticklabels=False,
+            showgrid=False,
+        ),
+        barmode='group',
+    )
+    fig.show()
+
+def display_story_hood_amount_per_median_pie(list):
+    #color_of_unselected = 'rgba(200, 200, 200)'
+    #color_of_selected = '#5A8AA2'
+
+    #colors=['#0d0887', '#46039f', '#7201a8', '#9c179e','#bd3786', '#d8576b','#ed7953', '#fb9f3a']
+    #colors=['#7201a8', '#9c179e', '#bd3786', '#d8576b', '#ed7953', '#fb9f3a', '#fdca26', '#f0f921']
+    #colors=['#0d0887', '#46039f', '#7201a8', '#9c179e', '#bd3786', '#d8576b', '#ed7953', '#fb9f3a', '#fdca26', '#f0f921']
+
+    colors = ['#C8C7C7', ] * 8
+    colors[2] = '#31566F'
+
+    #colors=['#5a8aa2','#507c93','#466f84','#3d6175','#335566','#2a4858',]
+    intervals = ["Less than 200K", "200K - 300K", "300K - 400K", "400K - 500K",
+                 "500K - 600K", "600K - 700K", "700K - 800K", "More than 800K"]
+    count = [0, 0, 0, 0,
+             0, 0, 0, 0]
+    for key in list:
+        if (key.median < 200000):
+            count[0] += 1
+        elif (300000 > key.median >= 200000):
+            count[1] += 1
+        elif (400000 > key.median >= 300000):
+            count[2] += 1
+        elif (500000 > key.median >= 400000):
+            count[3] += 1
+        elif (600000 > key.median >= 500000):
+            count[4] += 1
+        elif (700000 > key.median >= 600000):
+            count[5] += 1
+        elif (800000 > key.median >= 700000):
+            count[6] += 1
+        else:
+            count[7] += 1
+
+    fig = go.Figure(go.Pie(
+        labels=intervals,
+        values=count,
+        hole=0.5,
+        pull=[0.2,0.1,0.6,0.3,
+              0.1,0.2,0.1,0.5,]
+    ))
+    fig.update_traces(
+        hoverinfo='label+percent',
+        textinfo='value',
+        textposition='inside',
+        marker=dict(
+            colors=colors
+        ),
+    )
+    fig.update_layout(
+        template='plotly_white',
+        legend=dict(
+            x=1,
+            y=1,
+        ),
+        margin=dict(t=50,b=50,l=25,r=25),
+        uniformtext_minsize=12,
+        #uniformtext_mode='hide',
+    )
+    fig.show()
+
+
+def display_story_histogram_plots():
+    colors_high = '#5A8AA2'
+    colors_low = '#DB463D'
+    #colors_low = '#C8C7C7'
     combined = []
     for lo in LOW:
         combined.append(lo.get("name"))
     for hi in HIGH:
         combined.append(hi.get("name"))
+
     df = PRPRT_ASSES_DF.query("`Assessment Class % 1`==100 &"
                               "`Assessment Class 1`=='RESIDENTIAL' &"
                               "`Neighbourhood`==@combined")
-    fig = px.box(df,
-                 y=df["Neighbourhood"],
-                 x=df["Assessed Value"],
-                 points=False,
-                 )
+
+    df_0l = df.query("`Neighbourhood`==@LOW[0].get('name')")
+    df_1l = df.query("`Neighbourhood`==@LOW[1].get('name')")
+    df_2l = df.query("`Neighbourhood`==@LOW[2].get('name')")
+    df_0h = df.query("`Neighbourhood`==@HIGH[0].get('name')")
+    df_1h = df.query("`Neighbourhood`==@HIGH[1].get('name')")
+    df_2h = df.query("`Neighbourhood`==@HIGH[2].get('name')")
+
+    fig = make_subplots(rows=3, cols=2)
+
+    trace0l = go.Histogram(x=df_0l["Assessed Value"],name=LOW[0].get('name'),marker_color=colors_low,)
+    trace1l = go.Histogram(x=df_1l["Assessed Value"],name=LOW[1].get('name'),marker_color=colors_low,)
+    trace2l = go.Histogram(x=df_2l["Assessed Value"],name=LOW[2].get('name'),marker_color=colors_low,)
+    trace0h = go.Histogram(x=df_0h["Assessed Value"],name=HIGH[0].get('name'),marker_color=colors_high,)
+    trace1h = go.Histogram(x=df_1h["Assessed Value"],name=HIGH[1].get('name'),marker_color=colors_high,)
+    trace2h = go.Histogram(x=df_2h["Assessed Value"],name=HIGH[2].get('name'),marker_color=colors_high,)
+
+    fig.append_trace(trace0l, 1, 1)
+    fig.append_trace(trace0h, 1, 2)
+    fig.append_trace(trace1l, 2, 1)
+    fig.append_trace(trace1h, 2, 2)
+    fig.append_trace(trace2l, 3, 1)
+    fig.append_trace(trace2h, 3, 2)
+    fig.show()
+
+def display_story_histogram_overlay():
+    colors_high = '#5A8AA2'
+    colors_low = '#DB463D'
+    #colors_low = '#C8C7C7'
+    combined = []
+    for lo in LOW:
+        combined.append(lo.get("name"))
+    for hi in HIGH:
+        combined.append(hi.get("name"))
+
+    df = PRPRT_ASSES_DF.query("`Assessment Class % 1`==100 &"
+                              "`Assessment Class 1`=='RESIDENTIAL' &"
+                              "`Neighbourhood`==@combined")
+
+    df_0l = df.query("`Neighbourhood`==@LOW[0].get('name')")
+    df_1l = df.query("`Neighbourhood`==@LOW[1].get('name')")
+    df_2l = df.query("`Neighbourhood`==@LOW[2].get('name')")
+    df_0h = df.query("`Neighbourhood`==@HIGH[0].get('name')")
+    df_1h = df.query("`Neighbourhood`==@HIGH[1].get('name')")
+    df_2h = df.query("`Neighbourhood`==@HIGH[2].get('name')")
+
+    fig = go.Figure()
+    fig.add_trace( go.Histogram(x=df_0l["Assessed Value"],name=LOW[0].get('name'),marker_color=colors_low,) )
+    fig.add_trace( go.Histogram(x=df_1l["Assessed Value"],name=LOW[1].get('name'),marker_color=colors_low,) )
+    fig.add_trace( go.Histogram(x=df_2l["Assessed Value"],name=LOW[2].get('name'),marker_color=colors_low,) )
+    fig.add_trace( go.Histogram(x=df_0h["Assessed Value"],name=HIGH[0].get('name'),marker_color=colors_high,) )
+    fig.add_trace( go.Histogram(x=df_1h["Assessed Value"],name=HIGH[1].get('name'),marker_color=colors_high,) )
+    fig.add_trace( go.Histogram(x=df_2h["Assessed Value"],name=HIGH[2].get('name'),marker_color=colors_high,) )
+
+    fig.update_layout(barmode='overlay')
+    fig.update_traces(opacity=0.75)
+
     fig.show()
 
 def display_story_histogram():
+    colors1 = ['#5A8AA2',] *5
+    colors2 = ['#C8C7C7',] *5
+    colors = colors1 + colors2
     combined = []
     for lo in LOW:
         combined.append(lo.get("name"))
@@ -660,10 +875,244 @@ def display_story_histogram():
                  )
     fig.show()
 
+def display_story_bar():
+    color_high = '#5082C2'
+    color_middle = '#986FAF'
+    color_low = '#DB463D'
+    combined = []
+    low = []
+    high = []
+    for lo in LOW:
+        low.append(lo.get("name"))
+        combined.append(lo.get("name"))
+    for hi in HIGH:
+        high.append(hi.get("name"))
+        combined.append(hi.get("name"))
+    df_l = PRPRT_ASSES_DF.query("`Assessment Class % 1`==100 &"
+                              "`Assessment Class 1`=='RESIDENTIAL' &"
+                              "`Neighbourhood`==@low")
+    df_h = PRPRT_ASSES_DF.query("`Assessment Class % 1`==100 &"
+                              "`Assessment Class 1`=='RESIDENTIAL' &"
+                              "`Neighbourhood`==@high")
+    lymburn = display_lymburn()
+    fig = go.Figure()
+    fig.add_trace(go.Histogram(
+        y=df_l["Assessed Value"],
+        x=df_l["Neighbourhood"],
+        histfunc='avg',
+        marker_color=color_low,
+        texttemplate="%{y:.3s}",
+        #texttemplate="%{x}",
+        name="Lowest valued Neighbourhoods",
+    ))
+    fig.add_trace(go.Histogram(
+        y=lymburn["Assessed Value"],
+        x=lymburn["Neighbourhood"],
+        histfunc='avg',
+        marker_color=color_middle,
+        texttemplate="%{y:.3s}",
+        name="My Neighbourhood",
+    ))
+    fig.add_trace(go.Histogram(
+        y=df_h["Assessed Value"],
+        x=df_h["Neighbourhood"],
+        histfunc='avg',
+        marker_color=color_high,
+        texttemplate="%{y:.3s}",
+        #texttemplate="%{x}",
+        name="Highest valued Neighbourhoods",
+    ))
+    fig.update_traces(
+        hovertemplate=None,
+        textfont_size=24,
+        textangle=0,
+        textposition="outside",
+        cliponaxis=False,
+    )
+    fig.update_layout(
+        template="plotly_white",
+        title="Three of the Most and Least Expensive Neighbourhoods based on the Assessment Value",
+        legend=dict(
+            yanchor="top",
+            y=1.02,
+            xanchor="left",
+            x=0.01,
+            traceorder="normal",
+            font=dict(
+                size=18,
+                family="sans-serif",
+            ),
+        ),
+        yaxis=dict(
+            showticklabels=False,
+            showgrid=False,
+        ),
+    )
+    fig.show()
+
+def display_story_box():
+    color_high = '#5082C2'
+    color_middle = '#986FAF'
+    color_low = '#DB463D'
+    combined = []
+    low = []
+    high = []
+    for lo in LOW:
+        low.append(lo.get("name"))
+        combined.append(lo.get("name"))
+    for hi in HIGH:
+        high.append(hi.get("name"))
+        combined.append(hi.get("name"))
+    df_l = PRPRT_ASSES_DF.query("`Assessment Class % 1`==100 &"
+                              "`Assessment Class 1`=='RESIDENTIAL' &"
+                              "`Neighbourhood`==@low")
+    df_h = PRPRT_ASSES_DF.query("`Assessment Class % 1`==100 &"
+                              "`Assessment Class 1`=='RESIDENTIAL' &"
+                              "`Neighbourhood`==@high")
+    lymburn = display_lymburn()
+    fig = go.Figure()
+    fig.add_trace(go.Box(
+        y=df_l["Assessed Value"],
+        x=df_l["Neighbourhood"],
+        marker_color=color_low,
+        name="Lowest valued Neighbourhoods",
+    ))
+    fig.add_trace(go.Box(
+        y=lymburn["Assessed Value"],
+        x=lymburn["Neighbourhood"],
+        marker_color=color_middle,
+        name="My Neighbourhood",
+    ))
+    fig.add_trace(go.Box(
+        y=df_h["Assessed Value"],
+        x=df_h["Neighbourhood"],
+        marker_color=color_high,
+        name="Highest valued Neighbourhoods",
+    ))
+    fig.update_traces(
+        hovertemplate=None,
+    )
+    fig.update_layout(
+        title="Three of the Most and Least Expensive Neighbourhoods based on the Assessment Value",
+        template="plotly_white",
+        legend=dict(
+            yanchor="top",
+            y=1.02,
+            xanchor="left",
+            x=0.01,
+            traceorder="normal",
+            font=dict(
+                size=18,
+                family="sans-serif",
+            ),
+        ),
+    )
+    fig.show()
+
+def display_multiple_property_class():
+    multiple_property_class = PRPRT_ASSES_DF.query("`Assessment Class % 1`<100")
+    print(f"\nMultiple Property Class: {len(multiple_property_class)}")
+
+    not_residential = PRPRT_ASSES_DF.query("`Assessment Class 1`!='RESIDENTIAL'")
+    print( not_residential["Assessment Class 1"].unique() )
+    print(f"None Residential: {len(not_residential)}")
+
+    other_residential = PRPRT_ASSES_DF.query("`Assessment Class 1`=='OTHER RESIDENTIAL'")
+    commercial = PRPRT_ASSES_DF.query("`Assessment Class 1`=='COMMERCIAL'")
+    farmland = PRPRT_ASSES_DF.query("`Assessment Class 1`=='FARMLAND'")
+    print(f"Other Residential: {len(other_residential)}")
+    print(f"Commercial: {len(commercial)}")
+    print(f"Farmland: {len(farmland)}")
+
+def display_residential_by_ward():
+    df = PRPRT_ASSES_DF.query("`Assessment Class % 1`==100 &"
+                              "`Assessment Class 1`=='RESIDENTIAL'")
+    fig = go.Figure()
+    fig.add_trace(go.Histogram(
+        y=df["Assessed Value"],
+        x=df["Ward"],
+        histfunc='avg',
+    ))
+    fig.show()
+
+def display_residential_by_ward_by_neighbourhood():
+    df = PRPRT_ASSES_DF.query("`Assessment Class % 1`==100 &"
+                              "`Assessment Class 1`=='RESIDENTIAL'")
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        y=df["Assessed Value"],
+        x=df["Ward"],
+    ))
+    fig.show()
+
+def display_lymburn_map():
+    #lymburn_id = 4270
+    df = PRPRT_ASSES_DF.query("`Assessment Class % 1`==100 &"
+                              "`Assessment Class 1`=='RESIDENTIAL' &"
+                              "`Neighbourhood`=='LYMBURN'")
+    fig = go.Figure()
+    fig.add_trace()
+    fig.show()
+
+def display_ranges_map():
+    #https://data.edmonton.ca/City-Administration/City-of-Edmonton-Neighbourhoods/65fr-66s6
+    print(f"{4+2}")
+
+def display_lymburn():
+    df = PRPRT_ASSES_DF.query("`Assessment Class % 1`==100 &"
+                         "`Assessment Class 1`=='RESIDENTIAL' &"
+                         "`Neighbourhood`=='LYMBURN'")
+    return df
+
+def display_crime_occurences():
+    df = CRIME_OCCUR_DF
+    #occurrence_category = df['Occurrence_Category'].unique()
+    occurrence_category_unique = ['Disorder','Non-Violent','Violent','Traffic','Weapons','Drugs','Other',]
+    #print(occurrence_category)
+
+    # display occurrence group & type group per category
+    file = open("crime_occurrence_sorting.txt", "w")
+    for item in occurrence_category_unique:
+        df_oc = df.query("`Occurrence_Category`==@item")
+        list_og = df_oc['Occurrence_Group'].unique()
+        file.write(f"{'='*30}\n{item}:\n")
+        for second_item in list_og:
+            df_og = df_oc.query("`Occurrence_Group`==@second_item")
+            list_otg = df_og['Occurrence_Type_Group'].unique()
+            file.write(f" -> {second_item}:\n\t{list_otg}\n\n")
+        file.write("\n")
+    file.close()
+    print("file closed.")
+
+    #occurrence_group = df['Occurrence_Group'].unique()
+    # occurrence_group_unique = ['Mischief/Graffiti','Property','Disputes/Disturbances','Personal Violence','General Disorder','Provincial Statute Violations','Abandoned/Recovered/Seized Vehicles','Criminal Flights/Impaired Operation/Escape Lawful ','Weapons Violations','Drug Violations','Sexual Violations','Counterfeiting/Gaming and Betting','Explosives/Dangerous Goods','Workplace/Labour Violations',]
+    #print(occurrence_group)
+
+    #occurrence_type_group = df['Occurrence_Type_Group'].unique()
+    # occurrence_type_group_unique = ['Mischief - Property','Break and Enter Commercial','Theft Under $5000','Disturbance','Assault','Trouble with Person','Dispute','Theft Over $5000','Internet Fraud','Intoxicated Person','Recovered Motor Vehicle','Suspicious Person','Break and Enter Residential','Impaired Driving','Trespassing','Weapons Complaint','Fraud - Financial','Theft of Motor Vehicle','Criminal Flight Event','Possession Stolen Property','Weapons Complaint Firearm','Fraud General','Robbery Personal','Suspicious Vehicle','Drugs','Fraud Personal','Indecent Act','Public Mischief','Fire Arson','Property Damage','Abandoned Vehicle','Robbery Commercial','Graffiti','Liquor Act','Homicide','Counterfeit Money','Technology/Internet Crime','Dangerous Condition','Bomb Threat','Workplace Accident',]
+    #print(occurrence_type_group)
+
+
 if __name__ == '__main__':
+    # https://colordesigner.io/gradient-generator
+    # https://www.edmonton.ca/sites/default/files/public-files/assets/PDF/VIS_Book_1.pdf
     library_version()
     #property_assessment_data_all_neighbourhoods()
-    #get_median_of_each_neighbourhood()
+    #list_1 = copy.deepcopy( get_median_of_each_neighbourhood() )
 
-    display_story_box()
-    display_story_histogram()
+    #display_story_hood_amount_per_median_pie(list_1)
+    #display_story_histogram_overlay()
+
+    #display_story_hood_amount_(list_1)
+    #display_story_bar()
+    #display_story_box()
+
+    #display_story_histogram_plots()
+    #display_story_histogram()
+
+    #display_multiple_property_class()
+    #display_residential_by_ward()
+    #display_residential_by_ward_by_neighbourhood()
+    #display_lymburn_map()
+
+    display_crime_occurences()
