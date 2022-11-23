@@ -2,7 +2,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from dash import Dash, html, dcc, Input, Output
 
-import modules.NeighbourhoodNameModule as nnm
+from modules.NeighbourhoodNameModule import findLanguagesInNeighbourhood
 
 
 #=================================================================================================================
@@ -14,6 +14,9 @@ languages_file = "./source-files/2016_Census_-_Dwelling_Unit_by_Language__Neighb
 # create Pandas df and lists here
 df_crimes = pd.read_csv(crime_file)
 df_category = df_crimes.groupby(['Occurrence_Category'], as_index=False).size()
+
+df_languages = pd.read_csv(languages_file)
+column_header_lan = list(df_languages.columns.values)
 
 df_assessments = pd.read_csv(assessment_file)
 df_assessments = df_assessments[(df_assessments['Assessment Class 1'] == 'RESIDENTIAL')]
@@ -28,7 +31,37 @@ crimes_list = []
 for item in df_category.values.tolist():
     crimes_list.append(item[0])
 
+#===================================================================================================================
 
+def create_leftside_graph():
+    assessment = 'function'
+    languages = 'function'
+    crime = 'function'
+    return (
+        html.Div([
+            dcc.Graph(),
+            dcc.Graph(),
+            dcc.Graph(),
+        ])
+    )
+
+def create_rightside_graph():
+    assessment = 'function'
+    languages = 'function'
+    crime = 'function'
+    return (
+        html.Div([
+            dcc.Graph(),
+            dcc.Graph(),
+            dcc.Graph(),
+        ])
+    )
+
+def create_languages_figure_from_value(value):
+    df = pd.read_csv("./source-files/2016_Census_-_Dwelling_Unit_by_Language__Neighbourhood_Ward_.csv")
+    temp_languages = df.loc[df['NeighbourhoodName'] == value]
+
+    return("it worked")
 
 
 #===================================================================================================================
@@ -41,38 +74,44 @@ app.layout = html.Div([
         "Neighbourhood 1",
         dcc.Dropdown(
             neighbourhood_list,
+            multi=False,
+            searchable=False,
             placeholder="Select a neighbourhood",
-            id='neighbourhood-1-dropdown'
+            id='dd_selection_1',
+            value="CRESTWOOD",
         ),
-        html.Div(id='dd-1-output-container')
+        html.Div(id='graph_1'),
     ], style={}),
     html.Div([
         "Neighbourhood 2",
         dcc.Dropdown(
-           neighbourhood_list,
-           placeholder="Select a neighbourhood",
-           id='neighbourhood-2-dropdown'
+            neighbourhood_list,
+            multi=False,
+            searchable=True,
+            placeholder="Select a neighbourhood",
+            id='dd_selection_2',
+            value="RIVERDALE",
         ),
-        html.Div(id='dd-2-output-container')
+        html.Div(id='graph_2'),
     ], style={})
 ], style={'margin': '50px', 'display': 'flex', 'flex-direction': 'row', 'width': 1400})
 
 
 @app.callback(
-    Output('dd-1-output-container', 'children'),
-    [Input('neighbourhood-1-dropdown', 'value')],prevent_initial_call=True)
-def update_output_1(value):
+    Output('graph_1', 'children'),
+    [Input('dd_selection_1', 'value')],prevent_initial_call=True)
+def update_output_dd1(selection):
     return (
-        f"You have selected {value}"
+        f"You have selected {selection}"
     )
 
 @app.callback(
-    Output('dd-2-output-container', 'children'),
-    [Input('neighbourhood-2-dropdown', 'value')],prevent_initial_call=True)
-def update_output_2(value):
-    fig = nnm.findLanguagesInNeighbourhood(languages_file, value)
+    Output('graph_2', 'children'),
+    [Input('dd_selection_2', 'value')],prevent_initial_call=True)
+def update_output_dd2(selection):
+    output = create_languages_figure_from_value(selection)
     return (
-        dcc.Graph(figure=fig)
+        f"Selected {output}"
     )
 
 if __name__ == '__main__':
