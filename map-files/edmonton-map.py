@@ -91,7 +91,7 @@ def display_choropleth(candidate):
                                )
 
     fig.update_geos(fitbounds="locations", visible=False)
-    fig.update_layout(coloraxis_showscale=False, showlegend=None )
+    fig.update_layout(coloraxis_showscale=False, showlegend=None, margin={"r":0,"t":0,"l":0,"b":0})
     #fig.show()
     return fig
 
