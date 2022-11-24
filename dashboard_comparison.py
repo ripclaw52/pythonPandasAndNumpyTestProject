@@ -58,10 +58,24 @@ def create_rightside_graph():
     )
 
 def create_languages_figure_from_value(value):
-    df = pd.read_csv("./source-files/2016_Census_-_Dwelling_Unit_by_Language__Neighbourhood_Ward_.csv")
-    temp_languages = df.loc[df['NeighbourhoodName'] == value]
+    df = pd.read_csv(languages_file)
+    dff = df.loc[df['Neighbourhood Name'] == value]
+    #temp_languages 3 - 15
+    column_headers = list(dff.columns.values)[3:]
+    value_list = [
+        dff.iloc[0,  3], dff.iloc[0,  4], dff.iloc[0,  5],
+        dff.iloc[0,  6], dff.iloc[0,  7], dff.iloc[0,  8],
+        dff.iloc[0,  9], dff.iloc[0, 10], dff.iloc[0, 11],
+        dff.iloc[0, 12], dff.iloc[0, 13], dff.iloc[0, 14],
+        dff.iloc[0, 15],
+    ]
 
-    return("it worked")
+    fig = go.Figure(
+        data=[
+            go.Bar(x=value_list, y=column_headers)
+        ]
+    )
+    return fig
 
 
 #===================================================================================================================
@@ -80,7 +94,6 @@ app.layout = html.Div([
             id='dd_selection_1',
             value="CRESTWOOD",
         ),
-        html.Div(id='graph_1'),
     ], style={}),
     html.Div([
         "Neighbourhood 2",
@@ -92,8 +105,18 @@ app.layout = html.Div([
             id='dd_selection_2',
             value="RIVERDALE",
         ),
-        html.Div(id='graph_2'),
-    ], style={})
+    ], style={}),
+
+    html.Br(),
+    html.Br(),
+    html.Br(),
+
+    html.Div(id='graph_1'
+        #[dcc.Graph(id='graph_1')]
+    ),
+    html.Div(#id='graph_2'
+        [dcc.Graph(id='graph_2')]
+    ),
 ], style={'margin': '50px', 'display': 'flex', 'flex-direction': 'row', 'width': 1400})
 
 
@@ -106,12 +129,12 @@ def update_output_dd1(selection):
     )
 
 @app.callback(
-    Output('graph_2', 'children'),
+    Output('graph_2', 'figure'),
     [Input('dd_selection_2', 'value')],prevent_initial_call=True)
 def update_output_dd2(selection):
     output = create_languages_figure_from_value(selection)
     return (
-        f"Selected {output}"
+        dcc.Graph(figure=output)
     )
 
 if __name__ == '__main__':
