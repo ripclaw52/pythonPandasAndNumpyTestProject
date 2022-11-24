@@ -4,7 +4,7 @@ import plotly
 import plotly.express as px
 from dash import Dash, html, dcc, Input, Output
 
-#=================================================================================================================
+# =================================================================================================================
 
 # create Pandas df and lists here
 df_crimes = pd.read_csv('Occurrences_Last_90_Days.csv', low_memory=False)
@@ -14,10 +14,10 @@ df_assessments = pd.read_csv('Property_Assessment_Data_2022.csv', low_memory=Fal
 df_assessments = df_assessments[(df_assessments['Assessment Class 1'] == 'RESIDENTIAL')]
 df_neighbourhood_average = df_assessments.groupby(['Neighbourhood'], as_index=False)[['Assessed Value']].mean().round(0)
 
-#how to iterate through data frame:
+# how to iterate through data frame:
 # for index, row in df_neighbourhood_average.iterrows():
 #     print(row['Neighbourhood'], row['Assessed Value'])
-#=============================================================
+# =============================================================
 
 min_value = df_neighbourhood_average.min()[1]
 max_value = df_neighbourhood_average.max()[1]
@@ -27,9 +27,9 @@ crimes_list = []
 for item in df_category.values.tolist():
     crimes_list.append(item[0])
 
-#===================================================================================================================
+# ===================================================================================================================
 
-#APP LAYOUT
+# APP LAYOUT
 app = Dash(__name__)
 
 app.layout = html.Div([
@@ -52,12 +52,13 @@ app.layout = html.Div([
                    style={'color': 'white', 'padding-bottom': 10}),
 
         dcc.Input(placeholder='Enter Neighbourhood', type='text', id='Neighbourhood_input', value='',
-                  style={'marginRight':'10px', 'width': 350, 'padding-top': 10}),
+                  style={'marginRight': '10px', 'width': 350, 'padding-top': 10}),
 
         html.Br(),
         html.Br(),
         html.Label('Crime Statistics', style={'color': 'white', 'padding': 0}),
-        dcc.Dropdown(crimes_list, id= 'crime_dropdown', multi=True, style={'marginRight':'10px', 'width': 350, 'padding-top': 0}),
+        dcc.Dropdown(crimes_list, id='crime_dropdown', multi=True,
+                     style={'marginRight': '10px', 'width': 350, 'padding-top': 0}),
 
     ], style={'padding': 30, 'background': '#1C6387', 'width': '25vw'}),
 
@@ -66,14 +67,14 @@ app.layout = html.Div([
         html.Label('Neighbourhood Assessment Average', style={'color': '#1C6387', 'padding': 25}),
         html.Div(children=[
             dcc.RangeSlider(
-                min= 100000,
-                max= 1000000,
-                value= [250000,300000],
+                min=100000,
+                max=1000000,
+                value=[250000, 300000],
                 id='Neighbourhood_Average'),
-        ], style={'padding':'0, 20, 10', 'color': '#1C6387'}),
+        ], style={'padding': '0, 20, 10', 'color': '#1C6387'}),
 
         # html.Br(),
-        #dcc.RadioItems(['Residential', 'Commercial']),
+        # dcc.RadioItems(['Residential', 'Commercial']),
 
         html.Div(children=[
             dcc.RadioItems(['Residential', 'Commercial']),
@@ -83,14 +84,14 @@ app.layout = html.Div([
             dcc.Graph(id='the_graph')
         ], style={'padding': 0, 'flex': 1})
 
-    ], style={'padding': 10, 'width': '55vw'}),
-], style={'display': 'flex', 'flex-direction': 'row', 'width': '95vw', 'height': '95vh'})
+    ], style={'width': '55vw', 'flex': 1}),
+], id='Container', style={'display': 'flex', 'flex-direction': 'row', 'height': '95vh', 'padding-right': 10})
+
 
 @app.callback(
     Output('the_graph', 'figure'),
-    [Input('Neighbourhood_input', 'value'), Input('Neighbourhood_input', 'value')])
-
-def update_output(Neighbourhood_input):
+    [Input('Neighbourhood_input', 'value')])
+def update_output(NeighbourhoodName):
     # print(value)
     # df_neighbourhood_average_filtered = df_neighbourhood_average[
     #     (value[0] <= df_neighbourhood_average['Assessed Value']) & (df_neighbourhood_average['Assessed Value'] <= value[1])
@@ -109,7 +110,7 @@ def update_output(Neighbourhood_input):
     #
     # scatterplot.update_traces(textposition='top center')
     # return (scatterplot)
-# =====================================================================================================================#
+    # =====================================================================================================================#
     with open('City of Edmonton - Neighbourhoods.geojson', 'r') as f:
         neighbourhood = json.load(f)
 
@@ -123,17 +124,18 @@ def update_output(Neighbourhood_input):
 
     df1.head()
     fig = px.choropleth_mapbox(df1, geojson=neighbourhood, locations=df1.NeighbourhoodID,
-                               color=df1.NeighbourhoodName==Neighbourhood_input,
+                               color=df1.NeighbourhoodName == NeighbourhoodName,
                                mapbox_style='open-street-map',
                                zoom=9.8, center={"lat": 53.545883, "lon": -113.490112},
                                labels=df1.NeighbourhoodName,
-                               height=860, opacity=0.1, hover_name=df1.NeighbourhoodName
+                               height=872, hover_name=df1.NeighbourhoodName, opacity=0.25
                                )
 
-    fig.update_geos(fitbounds="locations", visible=False)
-    fig.update_layout(coloraxis_showscale=False, showlegend=False, margin={"r":0,"t":20,"l":20,"b":20})
+    fig.update_geos(fitbounds="locations")
+    fig.update_layout(coloraxis_showscale=False, showlegend=False, margin={"r": 0, "t": 20, "l": 20, "b": 20})
     # fig.show()
     return fig
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
