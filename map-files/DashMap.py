@@ -12,7 +12,7 @@ df_category = df_crimes.groupby(['Occurrence_Category'], as_index=False).size()
 
 df_assessments = pd.read_csv('Property_Assessment_Data_2022.csv', low_memory=False)
 df_assessments = df_assessments[(df_assessments['Assessment Class 1'] == 'RESIDENTIAL')]
-df_neighbourhood_average = df_assessments.groupby(['Neighbourhood'], as_index=False)[['Assessed Value']].mean().round(0)
+df_neighbourhood_average = df_assessments.groupby(['Neighbourhood', 'Neighbourhood ID'], as_index=False)[['Assessed Value']].mean().round(0)
 
 # how to iterate through data frame:
 # for index, row in df_neighbourhood_average.iterrows():
@@ -81,7 +81,8 @@ app.layout = html.Div([
         ], style={'text-align-last': 'end', 'color': '#1C6387'}),
 
         html.Div([
-            dcc.Graph(id='the_graph')
+            dcc.Graph(id='the_graph', config={'doubleClick': 'reset', 'showTips': True, 'displayModeBar': False,
+                                              'watermark': False})
         ], style={'padding': 0, 'flex': 1})
 
     ], style={'width': '55vw', 'flex': 1}),
@@ -90,14 +91,16 @@ app.layout = html.Div([
 
 @app.callback(
     Output('the_graph', 'figure'),
-    [Input('Neighbourhood_input', 'value')])
-def update_output(NeighbourhoodName):
-    # print(value)
-    # df_neighbourhood_average_filtered = df_neighbourhood_average[
-    #     (value[0] <= df_neighbourhood_average['Assessed Value']) & (df_neighbourhood_average['Assessed Value'] <= value[1])
-    # ]
-    # #print(df_neighbourhood_average_filtered[:5])
-    #
+    [Input('Neighbourhood_input', 'value'),
+     Input('Neighbourhood_Average', 'value')])
+def update_output(neighbourhoodName, assessmentRange):
+    print(assessmentRange)
+    df_neighbourhood_average_filtered = df_neighbourhood_average[
+        (assessmentRange[0] <= df_neighbourhood_average['Assessed Value']) & (df_neighbourhood_average['Assessed Value'] <= assessmentRange[1])
+    ]
+    #print(df_neighbourhood_average_filtered[:5])
+    print(df_neighbourhood_average_filtered)
+
     # scatterplot = px.scatter(
     #     data_frame = df_neighbourhood_average_filtered,
     #     x="Neighbourhood",
@@ -110,7 +113,9 @@ def update_output(NeighbourhoodName):
     #
     # scatterplot.update_traces(textposition='top center')
     # return (scatterplot)
-    # =====================================================================================================================#
+
+    #==================================================================================================================#
+
     with open('City of Edmonton - Neighbourhoods.geojson', 'r') as f:
         neighbourhood = json.load(f)
 
@@ -124,7 +129,7 @@ def update_output(NeighbourhoodName):
 
     df1.head()
     fig = px.choropleth_mapbox(df1, geojson=neighbourhood, locations=df1.NeighbourhoodID,
-                               color=df1.NeighbourhoodName == NeighbourhoodName,
+                               color=df1.NeighbourhoodName == neighbourhoodName,
                                mapbox_style='open-street-map',
                                zoom=9.8, center={"lat": 53.545883, "lon": -113.490112},
                                labels=df1.NeighbourhoodName,
@@ -135,7 +140,6 @@ def update_output(NeighbourhoodName):
     fig.update_layout(coloraxis_showscale=False, showlegend=False, margin={"r": 0, "t": 20, "l": 20, "b": 20})
     # fig.show()
     return fig
-
 
 if __name__ == '__main__':
     app.run_server(debug=True)
