@@ -1,5 +1,6 @@
 import pandas as pd
 import plotly.graph_objects as go
+import plotly.express as px
 from dash import Dash, html, dcc, Input, Output
 
 from modules.NeighbourhoodNameModule import findLanguagesInNeighbourhood
@@ -71,10 +72,21 @@ def create_languages_figure_from_value(value):
     ]
 
     fig = go.Figure(
-        data=[
-            go.Bar(x=value_list, y=column_headers)
-        ]
+        data=[go.Bar(x=value_list, y=column_headers, orientation="h",)],
     )
+
+    data = [{
+        'x': value_list,
+        'y': column_headers,
+        'type': 'bar',
+        'orientation': 'h',
+    }]
+
+    figure = {
+        'data': data,
+        'layout': [{ 'xanchor': 'right', }],
+    }
+
     return fig
 
 
@@ -114,10 +126,13 @@ app.layout = html.Div([
     html.Div(id='graph_1'
         #[dcc.Graph(id='graph_1')]
     ),
-    html.Div(#id='graph_2'
-        [dcc.Graph(id='graph_2')]
-    ),
-], style={'margin': '50px', 'display': 'flex', 'flex-direction': 'row', 'width': 1400})
+    html.Div([
+        dcc.Graph(id='lgraph_1'),
+        dcc.Graph(id='lgraph_2'),
+        dcc.Graph(id='lgraph_3'),
+    ]),
+], style={'margin': '50px', 'display': 'flex', 'flex-direction': 'row', 'width': 1400}
+)
 
 
 @app.callback(
@@ -129,13 +144,22 @@ def update_output_dd1(selection):
     )
 
 @app.callback(
-    Output('graph_2', 'figure'),
-    [Input('dd_selection_2', 'value')],prevent_initial_call=True)
+    [Output('lgraph_1', 'figure'),
+     Output('lgraph_2', 'figure'),
+     Output('lgraph_3', 'figure'),],
+    [Input('dd_selection_2', 'value')])
 def update_output_dd2(selection):
-    output = create_languages_figure_from_value(selection)
-    return (
-        dcc.Graph(figure=output)
-    )
+    default = "RIVERDALE"
+    if (selection == None):
+        o1 = create_languages_figure_from_value(default)
+        o2 = create_languages_figure_from_value(default)
+        o3 = create_languages_figure_from_value(default)
+    else:
+        o1 = create_languages_figure_from_value(selection)
+        o2 = create_languages_figure_from_value(selection)
+        o3 = create_languages_figure_from_value(selection)
+
+    return o1, o2, o3
 
 if __name__ == '__main__':
     app.run_server(debug=True)
