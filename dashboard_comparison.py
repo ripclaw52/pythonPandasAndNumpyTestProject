@@ -62,30 +62,17 @@ def create_languages_figure_from_value(value):
     df = pd.read_csv(languages_file)
     dff = df.loc[df['Neighbourhood Name'] == value]
     #temp_languages 3 - 15
-    column_headers = list(dff.columns.values)[3:]
+    column_headers = list(dff.columns.values)[4:13]
     value_list = [
-        dff.iloc[0,  3], dff.iloc[0,  4], dff.iloc[0,  5],
+        dff.iloc[0,  4], dff.iloc[0,  5],
         dff.iloc[0,  6], dff.iloc[0,  7], dff.iloc[0,  8],
         dff.iloc[0,  9], dff.iloc[0, 10], dff.iloc[0, 11],
-        dff.iloc[0, 12], dff.iloc[0, 13], dff.iloc[0, 14],
-        dff.iloc[0, 15],
+        dff.iloc[0, 12], dff.iloc[0, 13],
     ]
 
     fig = go.Figure(
         data=[go.Bar(x=value_list, y=column_headers, orientation="h",)],
     )
-
-    data = [{
-        'x': value_list,
-        'y': column_headers,
-        'type': 'bar',
-        'orientation': 'h',
-    }]
-
-    figure = {
-        'data': data,
-        'layout': [{ 'xanchor': 'right', }],
-    }
 
     return fig
 
@@ -97,58 +84,69 @@ app = Dash(__name__)
 
 app.layout = html.Div([
     html.Div([
+        html.Div([
         "Neighbourhood 1",
         dcc.Dropdown(
             neighbourhood_list,
             multi=False,
             searchable=False,
             placeholder="Select a neighbourhood",
-            id='dd_selection_1',
+            id='l_dd_selection',
             value="CRESTWOOD",
         ),
     ], style={}),
+        html.Div([
+            dcc.Graph(id='l_graph_1'),
+            dcc.Graph(id='l_graph_2'),
+            dcc.Graph(id='l_graph_3'),
+        ]),
+    ], style={ 'margin':'25px', 'display':'flex', 'flex-direction':'column', 'width':'50%', }),
     html.Div([
+        html.Div([
         "Neighbourhood 2",
         dcc.Dropdown(
             neighbourhood_list,
             multi=False,
             searchable=True,
             placeholder="Select a neighbourhood",
-            id='dd_selection_2',
+            id='r_dd_selection',
             value="RIVERDALE",
         ),
     ], style={}),
-
-    html.Br(),
-    html.Br(),
-    html.Br(),
-
-    html.Div(id='graph_1'
-        #[dcc.Graph(id='graph_1')]
-    ),
-    html.Div([
-        dcc.Graph(id='lgraph_1'),
-        dcc.Graph(id='lgraph_2'),
-        dcc.Graph(id='lgraph_3'),
-    ]),
-], style={'margin': '50px', 'display': 'flex', 'flex-direction': 'row', 'width': 1400}
+        html.Div([
+            dcc.Graph(id='r_graph_1'),
+            dcc.Graph(id='r_graph_2'),
+            dcc.Graph(id='r_graph_3'),
+        ]),
+    ], style={ 'margin':'25px', 'display':'flex', 'flex-direction':'column', 'width':'50%', }),
+], style={'margin': '50px', 'display': 'flex', 'flex-direction': 'row', }
 )
 
 
 @app.callback(
-    Output('graph_1', 'children'),
-    [Input('dd_selection_1', 'value')],prevent_initial_call=True)
-def update_output_dd1(selection):
-    return (
-        f"You have selected {selection}"
-    )
+    [Output('l_graph_1', 'figure'),
+     Output('l_graph_2', 'figure'),
+     Output('l_graph_3', 'figure'),],
+    [Input('l_dd_selection', 'value')])
+def update_output_l_dd(selection):
+    default = "CRESTWOOD"
+    if (selection == None):
+        o1 = create_languages_figure_from_value(default)
+        o2 = create_languages_figure_from_value(default)
+        o3 = create_languages_figure_from_value(default)
+    else:
+        o1 = create_languages_figure_from_value(selection)
+        o2 = create_languages_figure_from_value(selection)
+        o3 = create_languages_figure_from_value(selection)
+
+    return o1, o2, o3
 
 @app.callback(
-    [Output('lgraph_1', 'figure'),
-     Output('lgraph_2', 'figure'),
-     Output('lgraph_3', 'figure'),],
-    [Input('dd_selection_2', 'value')])
-def update_output_dd2(selection):
+    [Output('r_graph_1', 'figure'),
+     Output('r_graph_2', 'figure'),
+     Output('r_graph_3', 'figure'),],
+    [Input('r_dd_selection', 'value')])
+def update_output_r_dd(selection):
     default = "RIVERDALE"
     if (selection == None):
         o1 = create_languages_figure_from_value(default)
