@@ -62,12 +62,12 @@ def create_languages_figure_from_value(value):
     df = pd.read_csv(languages_file)
     dff = df.loc[df['Neighbourhood Name'] == value]
     #temp_languages 3 - 15
-    column_headers = list(dff.columns.values)[4:13]
+    column_headers = list(dff.columns.values)[4:14]
     value_list = [
-        dff.iloc[0,  4], dff.iloc[0,  5],
-        dff.iloc[0,  6], dff.iloc[0,  7], dff.iloc[0,  8],
-        dff.iloc[0,  9], dff.iloc[0, 10], dff.iloc[0, 11],
-        dff.iloc[0, 12], dff.iloc[0, 13],
+        dff.iloc[0,  4], dff.iloc[0,  5], dff.iloc[0,  6],
+        dff.iloc[0,  7], dff.iloc[0,  8], dff.iloc[0,  9],
+        dff.iloc[0, 10], dff.iloc[0, 11], dff.iloc[0, 12],
+        dff.iloc[0, 13], dff.iloc[0, 14],
     ]
 
     fig = go.Figure(
