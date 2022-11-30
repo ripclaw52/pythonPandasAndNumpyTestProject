@@ -91,16 +91,16 @@ app.layout = html.Div([
             multi=False,
             searchable=False,
             placeholder="Select a neighbourhood",
-            id='l_dd_selection',
+            id='dd_selection1',
             value="CRESTWOOD",
         ),
     ], style={}),
         html.Div([
-            dcc.Graph(id='l_graph_1'),
-            dcc.Graph(id='l_graph_2'),
-            dcc.Graph(id='l_graph_3'),
+            dcc.Graph(id='a_graph1'),
+            dcc.Graph(id='l_graph1'),
         ]),
-    ], style={ 'margin':'25px', 'display':'flex', 'flex-direction':'column', 'width':'50%', }),
+    ], style={ 'margin':'25px', 'display':'flex', 'flex-direction':'column', 'width':'25%', }),
+
     html.Div([
         html.Div([
         "Neighbourhood 2",
@@ -109,55 +109,81 @@ app.layout = html.Div([
             multi=False,
             searchable=True,
             placeholder="Select a neighbourhood",
-            id='r_dd_selection',
+            id='dd_selection2',
             value="RIVERDALE",
         ),
     ], style={}),
         html.Div([
-            dcc.Graph(id='r_graph_1'),
-            dcc.Graph(id='r_graph_2'),
-            dcc.Graph(id='r_graph_3'),
+            dcc.Graph(id='a_graph2'),
+            dcc.Graph(id='l_graph2'),
         ]),
-    ], style={ 'margin':'25px', 'display':'flex', 'flex-direction':'column', 'width':'50%', }),
+    ], style={ 'margin':'25px', 'display':'flex', 'flex-direction':'column', 'width':'25%', }),
+
+    html.Div([
+        html.Div([
+        "Neighbourhood 3",
+        dcc.Dropdown(
+            neighbourhood_list,
+            multi=False,
+            searchable=True,
+            placeholder="Select a neighbourhood",
+            id='dd_selection3',
+            value="RIVERDALE",
+        ),
+    ], style={}),
+        html.Div([
+            dcc.Graph(id='a_graph3'),
+            dcc.Graph(id='l_graph3'),
+        ]),
+    ], style={ 'margin':'25px', 'display':'flex', 'flex-direction':'column', 'width':'25%', }),
 ], style={'margin': '50px', 'display': 'flex', 'flex-direction': 'row', }
 )
 
 
 @app.callback(
-    [Output('l_graph_1', 'figure'),
-     Output('l_graph_2', 'figure'),
-     Output('l_graph_3', 'figure'),],
-    [Input('l_dd_selection', 'value')])
-def update_output_l_dd(selection):
+    [Output('a_graph1', 'figure'),
+     Output('l_graph1', 'figure'),],
+    [Input('dd_selection2', 'value')])
+def update_output(selection):
     default = "CRESTWOOD"
     if (selection == None):
         o1 = create_languages_figure_from_value(default)
         o2 = create_languages_figure_from_value(default)
-        o3 = create_languages_figure_from_value(default)
     else:
         o1 = create_languages_figure_from_value(selection)
         o2 = create_languages_figure_from_value(selection)
-        o3 = create_languages_figure_from_value(selection)
 
-    return o1, o2, o3
+    return o1, o2
 
 @app.callback(
-    [Output('r_graph_1', 'figure'),
-     Output('r_graph_2', 'figure'),
-     Output('r_graph_3', 'figure'),],
-    [Input('r_dd_selection', 'value')])
-def update_output_r_dd(selection):
+    [Output('a_graph2', 'figure'),
+     Output('l_graph2', 'figure'),],
+    [Input('dd_selection2', 'value')])
+def update_output(selection):
     default = "RIVERDALE"
     if (selection == None):
         o1 = create_languages_figure_from_value(default)
         o2 = create_languages_figure_from_value(default)
-        o3 = create_languages_figure_from_value(default)
     else:
         o1 = create_languages_figure_from_value(selection)
         o2 = create_languages_figure_from_value(selection)
-        o3 = create_languages_figure_from_value(selection)
 
-    return o1, o2, o3
+    return o1, o2
+
+@app.callback(
+    [Output('a_graph3', 'figure'),
+     Output('l_graph3', 'figure'),],
+    [Input('dd_selection3', 'value')])
+def update_output(selection):
+    default = "MACEWAN"
+    if (selection == None):
+        o1 = create_languages_figure_from_value(default)
+        o2 = create_languages_figure_from_value(default)
+    else:
+        o1 = create_languages_figure_from_value(selection)
+        o2 = create_languages_figure_from_value(selection)
+
+    return o1, o2
 
 if __name__ == '__main__':
     app.run_server(debug=True)
