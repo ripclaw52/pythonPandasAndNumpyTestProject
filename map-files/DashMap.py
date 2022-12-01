@@ -129,7 +129,7 @@ def update_output(neighbourhoodName, assessmentRange):
 
     df1.head()
     fig = px.choropleth_mapbox(df1, geojson=neighbourhood, locations=df1.NeighbourhoodID,
-                               color=df1.NeighbourhoodName == neighbourhoodName,
+                               color=df1.Neighbourhood == neighbourhoodName,
                                mapbox_style='open-street-map',
                                zoom=9.8, center={"lat": 53.545883, "lon": -113.490112},
                                labels=df1.NeighbourhoodName,
