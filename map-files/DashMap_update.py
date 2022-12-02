@@ -162,7 +162,7 @@ def update_output(neighbourhoodName, assessmentRange, clickData):
                                center=center,
                                height=800, opacity=0.25,
                                hover_name="NeighbourhoodName",
-                               hover_data=["NeighbourhoodName", ("${:.2f}".format(str('Assessed Value')))],
+                               hover_data={'Assessed Value': True, 'color': False},
                                color_discrete_map={'green': "green", 'yellow': 'yellow', "red": 'purple'},
                                custom_data=['NeighbourhoodName', 'Assessed Value', 'Longitude', 'Latitude'],
                                )
