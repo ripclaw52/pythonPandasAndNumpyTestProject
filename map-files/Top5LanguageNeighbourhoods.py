@@ -89,7 +89,6 @@ barchart.update_layout(
         tickfont_size=14,
     )
 )
-barchart.update_traces(textposition='outside',
-                       width=[.5, .5, .5, .5, .5, .5, ])
+barchart.update_traces(textposition='outside', width=[.5, .5, .5, .5, .5, .5, ])
 
 pio.show(barchart)
