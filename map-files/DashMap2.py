@@ -7,14 +7,17 @@ from dash import Dash, html, dcc, Input, Output
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
-
-# create Pandas df and lists here ==================================================================================== #
-
+# ==================================================================================================================== #
+# DATAFRAMES AND DATA PREPROCESSING
+# ==================================================================================================================== #
 # CRIMES DATAFRAME
 df_crimes = pd.read_csv('Occurrences_Last_90_Days.csv', low_memory=False)
 df_crimes_category = df_crimes.groupby(['Occurrence_Category'], as_index=False).size()
-#df_crimes_property = df_crimes[(df_crimes['Occurrence_Group'] == 'Property')]
+
+
+# df_crimes_property = df_crimes[(df_crimes['Occurrence_Group'] == 'Property')]
 # print(df_crimes_property)
+
 def occurence_group_controller(crime_stats):
     new_df = df_crimes[df_crimes.Occurrence_Category == crime_stats]
 
@@ -30,6 +33,7 @@ def occurence_group_type_controller(occurence_group):
 
     return dfg["Occurrence_Type_Group"].values.tolist()
 
+
 def mapped_crime_list():
     ret = {"Disorder": occurence_group_controller("Disorder"),
            "Non-Violent": occurence_group_controller("Non-Violent"),
@@ -41,33 +45,40 @@ def mapped_crime_list():
 
     return ret
 
+# crimes_list = []
+# for item in df_crimes_category.values.tolist():
+#     crimes_list.append(item[0])
+crimes_list = df_crimes['Occurrence_Category'].unique()
+crimes_color_map = dict(zip(crimes_list, px.colors.qualitative.G10))
+
+# ==================================================================================================================== #
 # LANGUAGES DATAFRAME
 df_languages = pd.read_csv("2016_Census_-_Dwelling_Unit_by_Language__Neighbourhood_Ward_.csv", low_memory=False)
 languages_list = df_languages.columns.values[4:14]
-#print(languages_list)
+# print(languages_list)
 
+# ==================================================================================================================== #
 # ASSESSMENT VALUE DATAFRAME
 df_assessments = pd.read_csv('Property_Assessment_Data_2022.csv', low_memory=False)
 df_assessments = df_assessments[(df_assessments['Assessment Class 1'] == 'RESIDENTIAL')]
 df_neighbourhood_average = \
-df_assessments.groupby(['Neighbourhood', 'Neighbourhood ID'],
-                       as_index=False)[
-    ['Assessed Value', 'Latitude', 'Longitude']].mean()
+    df_assessments.groupby(['Neighbourhood', 'Neighbourhood ID'],
+                           as_index=False)[
+        ['Assessed Value', 'Latitude', 'Longitude']].mean()
 
 min_value = df_neighbourhood_average.min()[1]
 max_value = df_neighbourhood_average.max()[1]
 
-crimes_list = []
-
-for item in df_crimes_category.values.tolist():
-    crimes_list.append(item[0])
 neighbourhood_list = df_assessments['Neighbourhood'].unique()
 
+# ==================================================================================================================== #
 # NEIGHBOURHOOD GEOJSON FOR CHOROPLETH MAP
 # set 'neighbourhood' as a global value to avoid loading same data everytime
 with open('City of Edmonton - Neighbourhoods.geojson', 'r') as f:
     neighbourhood = json.load(f)
 
+# ==================================================================================================================== #
+# DASH APP INTERFACE SETUP
 # ==================================================================================================================== #
 
 # APP LAYOUT
@@ -76,12 +87,12 @@ app = Dash(__name__)
 app.layout = html.Div([
 
     html.Div(children=[
-            dcc.RadioItems(options=['Main Page', 'Comparison'],
-                           value='Main Page',
-                           persistence=True,
-                           style={'text-align-last': 'end', 'color': '#1C6387', 'position': 'absolute', 'right': 10},
-                           id='change_page')
-            ]),
+        dcc.RadioItems(options=['Main Page', 'Comparison'],
+                       value='Main Page',
+                       persistence=True,
+                       style={'text-align-last': 'end', 'color': '#1C6387', 'position': 'absolute', 'right': 10},
+                       id='change_page')
+    ]),
 
     html.Div(children=[
 
@@ -90,7 +101,7 @@ app.layout = html.Div([
                 html.Label('Moving to Edmonton Made Easy',
                            style={
                                'color': 'white',
-                               'padding': '30, 30, 30, 30',
+                               'padding': '30, 30, 30, 0',
                                'width': 60,
                                'font': 'Poppins',
                                'font-size': 25,
@@ -100,7 +111,7 @@ app.layout = html.Div([
                 html.Br(),
                 html.Br(),
 
-                html.Label('Neighbourhood Search', style={'color': 'white', 'padding-bottom': 10}),
+                html.Label('Neighbourhoods Within Assessment Range', style={'color': 'white', 'padding-bottom': 10}),
 
                 dcc.Dropdown(options=neighbourhood_list,
                              placeholder='Enter Neighbourhood', id='Neighbourhood_input',
@@ -112,7 +123,6 @@ app.layout = html.Div([
                 html.Label('Crime Statistics', style={'color': 'white', 'padding': 0}),
                 dcc.Dropdown(crimes_list, id='crime_dropdown', multi=True,
                              style={'marginRight': '10px', 'width': 350, 'padding-top': 0}),
-
 
             ], id='map_filters', style={'padding': 30, 'background': '#1C6387'}),
 
@@ -131,8 +141,9 @@ app.layout = html.Div([
                 # Contains Map graph and progress indicator
                 html.Div([
                     dcc.Loading(
-                        dcc.Graph(id='the_graph', config={'doubleClick': 'reset', 'showTips': True, 'displayModeBar': False,
-                                                          'watermark': False}, style={'height': 550})),
+                        dcc.Graph(id='the_graph',
+                                  config={'doubleClick': 'reset', 'showTips': True, 'displayModeBar': False,
+                                          'watermark': False}, style={'height': 550})),
 
                 ], id='map_container', style={'padding': 0, 'flex': 1}),
 
@@ -158,25 +169,26 @@ app.layout = html.Div([
                 html.Br(),
 
                 dcc.RadioItems(
-                        labelStyle={'display': 'block'},
-                        id='general_crime',
-                        options=[{'label': k, 'value': k} for k in mapped_crime_list().keys()],
-                        value='Disorder',
-                        style={'color': 'white', 'padding': '10, 0'}
-                    ),
+                    labelStyle={'display': 'block'},
+                    id='general_crime',
+                    options=[{'label': k, 'value': k} for k in mapped_crime_list().keys()],
+                    value='Disorder',
+                    style={'color': 'white', 'padding': '10, 0'}
+                ),
 
                 html.Hr(),
 
                 dcc.RadioItems(
-                        id='descriptive_crime', style={'color': 'white', 'display': 'inline-grid'}
-                    #labelStyle={'display': 'block'},
-                    ),
+                    id='descriptive_crime', style={'color': 'white', 'display': 'inline-grid'}
+                    # labelStyle={'display': 'block'},
+                ),
 
-                    html.Hr(),
+                html.Hr(),
 
-                    html.Div(id='display-selected-values')
+                html.Div(id='display-selected-values')
 
-            ], id='crime_filters', style={'padding': 15, 'background': '#1C6387', 'position': 'relative', 'width': 390}),
+            ], id='crime_filters',
+                style={'padding': 15, 'background': '#1C6387', 'position': 'relative', 'width': 390}),
 
             # Bottom Graphs
             html.Div(children=[
@@ -185,12 +197,13 @@ app.layout = html.Div([
                 dcc.Loading(
                     dcc.Graph(id='crime_cat_graph', config={'doubleClick': 'reset', 'showTips': True,
                                                             'displayModeBar': False, 'watermark': False},
-                                                            style={'flex-grow': 1})),
+                              style={'flex-grow': 1})),
                 dcc.Loading(
                     dcc.Graph(id='crime_occur_graph', config={'doubleClick': 'reset', 'showTips': True,
-                             'displayModeBar': False, 'watermark': False}, style={'flex-grow': 1, 'margin-left': 25,
-                                                                                  'border-right': '1px solid #ccc',
-                                                                                  'padding-right': 75})),
+                                                              'displayModeBar': False, 'watermark': False},
+                              style={'flex-grow': 1, 'margin-left': 25,
+                                     'border-right': '1px solid #ccc',
+                                     'padding-right': 75})),
 
                 html.Hr(),
                 # html.Hr(),
@@ -208,14 +221,16 @@ app.layout = html.Div([
                     # style={'padding': 0, 'flex': 1, 'display': 'inline-flex', 'float': 'right'})),
                     # ], id='graphs_container', style={'padding': 0, 'flex': 1, 'display': 'inline-flex', 'float': 'right'}),
                 ], id='language-dropdown-cont', style={'flex-grow': 1, 'padding-right': 10}),
-            ], id='bottom_graphs', style={'display': 'flex', 'align-items': 'flex-end', 'width': '72vw', 'flex-wrap': 'wrap'
-                                          , 'flex-direction': 'row', 'justify-content': 'space-around'}),
+            ], id='bottom_graphs',
+                style={'display': 'flex', 'align-items': 'flex-end', 'width': '72vw', 'flex-wrap': 'wrap'
+                    , 'flex-direction': 'row', 'justify-content': 'space-around'}),
 
         ], id='bottom_container', style={'display': 'flex', 'flex-direction': 'row', 'height': '33.51vh',
                                          'flex-wrap': 'wrap', 'justify-content': 'space-between', 'padding-top': 16,
                                          'padding-bottom': 10}),
     ], id='main-page-container', style={'display': 'block'}),
 ], id='main-container', style={'display': 'block', 'padding': 4})
+
 
 # ==================================================================================================================== #
 # PAGES INTERFACE
@@ -229,6 +244,7 @@ def switch_pages(switch_to_page):
     if switch_to_page == 'Comparison':
         return {'display': 'none'}
 
+
 # ==================================================================================================================== #
 # CRIME GRAPH INTERFACE
 
@@ -237,6 +253,7 @@ def switch_pages(switch_to_page):
     [Input('general_crime', 'value')])
 def set_general_crime_options(general_crime):
     return [{'label': i, 'value': i} for i in mapped_crime_list()[general_crime]]
+
 
 @app.callback(
     Output('crime_cat_graph', 'figure'),
@@ -282,6 +299,7 @@ def general_crimes(general_crime):
     barchart.update_traces(textposition='outside')
     return barchart
 
+
 @app.callback(
     Output('crime_occur_graph', 'figure'),
     [Input('descriptive_crime', 'value')])
@@ -326,13 +344,13 @@ def update_crime_occur_graph(descriptive_crime):
     barchart.update_traces(textposition='outside')
     return barchart
 
+
 # ==================================================================================================================== #
 # LANGUAGE GRAPH INTERFACE
 @app.callback(
     Output('language_graph', 'figure'),
     Input('Languages_dropdown', 'value'))
 def language_output(language):
-
     df_languages = pd.read_csv("2016_Census_-_Dwelling_Unit_by_Language__Neighbourhood_Ward_.csv")
     df_languages_sorted = df_languages.sort_values(by=[language], ascending=False)
 
@@ -349,21 +367,21 @@ def language_output(language):
     # # print(language)
     # print(df_languages_sorted.French[::-1])
     barchart = px.bar(
-                data_frame=df_languages_sorted,
-                x=language,
-                y=df_languages_sorted.Neighbourhood,
-                opacity=0.9,
-                orientation="h",
-                width=400,
-                height=300,
-                title=f"Top 5 {language}-speaking Neighbourhoods",
-                hover_name=language, hover_data=[language]
-            )
+        data_frame=df_languages_sorted,
+        x=language,
+        y=df_languages_sorted.Neighbourhood,
+        opacity=0.9,
+        orientation="h",
+        width=400,
+        height=300,
+        title=f"Top 5 {language}-speaking Neighbourhoods",
+        hover_name=language, hover_data=[language]
+    )
 
     barchart.update_layout(
         margin=dict(l=5, r=5, t=35, b=5),
         title_font_size=12,
-        #title_y=0.8,
+        # title_y=0.8,
         xaxis=dict(
             title=f'{language} Households',
             titlefont_size=10,
@@ -383,14 +401,17 @@ def language_output(language):
     barchart.update_traces(textposition='outside')
     return barchart
 
+
 # ==================================================================================================================== #
 # CHOROPLETH MAP INTERFACE
 @app.callback(
     Output('the_graph', 'figure'),
+    Output('Neighbourhood_input', 'options'),
     Input('Neighbourhood_input', 'value'),
     Input('Neighbourhood_Average', 'value'),
-    Input('the_graph', 'clickData'))
-def update_output(neighbourhoodName, assessmentRange, clickData):
+    Input('the_graph', 'clickData'),
+    Input('crime_dropdown', 'value'))
+def update_output(neighbourhoodName, assessmentRange, clickData, crime_dropdown):
     # filters the df_neighbourhood_average based on the range in the slider
     df_neighbourhood_average_filtered = df_neighbourhood_average.loc[
         (assessmentRange[0] <= df_neighbourhood_average['Assessed Value']) & (
@@ -398,17 +419,18 @@ def update_output(neighbourhoodName, assessmentRange, clickData):
         ]
 
     df_neighbourhood_average_filtered = df_neighbourhood_average_filtered.rename(
-        columns={'Neighbourhood': 'NeighbourhoodName', 'Neighbourhood ID': 'NeighbourhoodID'})
+        columns={'Neighbourhood': 'NeighbourhoodName', 'Neighbourhood ID': 'NeighbourhoodID',
+                 'Assessed Value': 'AssessedValue'})
     # print(df_neighbourhood_average_filtered)
     df_neighbourhood_average_filtered['NeighbourhoodID'] = df_neighbourhood_average_filtered['NeighbourhoodID'].astype(
         int).astype(str)
     # print(df_neighbourhood_average_filtered['NeighbourhoodID'])
 
-    df_neighbourhood_average_filtered['color'] = 'red'
+    df_neighbourhood_average_filtered['Legend'] = 'Neighbourhoods'
     zoom = 9.2
     center = {"lat": 53.545883, "lon": -113.490112}
 
-    #click on neighbourhood
+    # click on neighbourhood
     if clickData:
         click_location = clickData['points'][0]['location']
         print(click_location)
@@ -418,13 +440,13 @@ def update_output(neighbourhoodName, assessmentRange, clickData):
         center = {"lat": clickData['points'][0]['customdata'][3], "lon": clickData['points'][0]['customdata'][2]}
         zoom = 13.3
 
-    #highlight neighbourhood name selected.
+    # highlight neighbourhood name selected.
     if neighbourhoodName:
         select_name_filter = df_neighbourhood_average_filtered['NeighbourhoodName'] == neighbourhoodName
         print(select_name_filter)
-        df_neighbourhood_average_filtered.loc[select_name_filter, 'color'] = 'green'
+        df_neighbourhood_average_filtered.loc[select_name_filter, 'Legend'] = 'Selected Neighbourhood'
 
-    # neighbourhoodID_List = []
+    # ================================================================================================================ #
     i = 0
     for feature in neighbourhood["features"]:
         feature['id'] = int(neighbourhood["features"][i]['properties']['neighbourhood_number'])
@@ -432,21 +454,37 @@ def update_output(neighbourhoodName, assessmentRange, clickData):
 
     fig = px.choropleth_mapbox(df_neighbourhood_average_filtered, geojson=neighbourhood,
                                locations=df_neighbourhood_average_filtered.NeighbourhoodID,
-                               color='color',
+                               color='Legend',
                                mapbox_style='open-street-map',
                                zoom=zoom,
                                center=center,
                                height=538, opacity=0.25,
-                               hover_data={'color': False, 'Assessed Value': True, 'NeighbourhoodID': True},
+                               hover_data={'Legend': False, 'AssessedValue': True, 'NeighbourhoodID': True},
                                hover_name='NeighbourhoodName',
                                color_discrete_map={'green': "green", 'yellow': 'yellow', "red": 'purple'},
-                               custom_data=['NeighbourhoodName', 'Assessed Value', 'Longitude', 'Latitude'],
+                               custom_data=['NeighbourhoodName', 'AssessedValue', 'Longitude', 'Latitude'],
                                )
 
-    fig.update_geos(fitbounds="locations")
+    if crime_dropdown:
+        for crime_cat in crime_dropdown:
+            this_crime_df = df_crimes.loc[df_crimes['Occurrence_Category'] == crime_cat]
+            fig.add_scattermapbox(
+                below=False,
+                lon=this_crime_df.X.values.tolist(),
+                lat=this_crime_df.Y.values.tolist(),
+                hovertext=crime_cat,
+                marker_size=10,
+                marker_color=crimes_color_map[crime_cat],
+                showlegend=True,
+                name=crime_cat,
+                hoverinfo='text',
+            )
 
-    fig.update_layout(coloraxis_showscale=False, showlegend=False, margin={"r": 0, "t": 20, "l": 20, "b": 20})
-    return fig
+    fig.update_layout(margin={"r": 0, "t": 20, "l": 20, "b": 20},
+                      legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01))
+    fig.update_geos(fitbounds="locations")
+    fig.update_layout(coloraxis_showscale=False, margin={"r": 0, "t": 20, "l": 20, "b": 20})
+    return fig, df_neighbourhood_average_filtered['NeighbourhoodName'].unique()
 
 
 if __name__ == '__main__':
