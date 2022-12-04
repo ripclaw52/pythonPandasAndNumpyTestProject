@@ -1,4 +1,3 @@
-import daq as daq
 import pandas as pd
 import json
 import plotly.express as px
@@ -77,145 +76,158 @@ app = Dash(__name__)
 app.layout = html.Div([
 
     html.Div(children=[
+            dcc.RadioItems(options=['Main Page', 'Comparison'],
+                           value='Main Page',
+                           persistence=True,
+                           style={'text-align-last': 'end', 'color': '#1C6387', 'position': 'absolute', 'right': 10},
+                           id='change_page')
+            ]),
 
-        # html.Div(children=[
-        #     dcc.RadioItems(['Residential', 'Commercial']),
-        # ], style={'text-align-last': 'end', 'color': '#1C6387'}),
-        html.Div([
-            daq.BooleanSwitch(id='my-boolean-switch', on=False),
-            html.Div(id='boolean-switch-output-1')
-        ]),
-
-        html.Div(children=[
-            html.Label('Moving to Edmonton Made Easy',
-                       style={
-                           'color': 'white',
-                           'padding': '30, 30, 30, 30',
-                           'width': 60,
-                           'font': 'Poppins',
-                           'font-size': 25,
-                           'text-align': 'center',
-                       }),
-            html.Br(),
-            html.Br(),
-            html.Br(),
-
-            html.Label('Neighbourhood Search', style={'color': 'white', 'padding-bottom': 10}),
-
-            dcc.Dropdown(options=neighbourhood_list,
-                         placeholder='Enter Neighbourhood', id='Neighbourhood_input',
-                         style={'marginRight': '10px', 'width': 350, 'padding-top': 10},
-                         ),
-
-            html.Br(),
-            html.Br(),
-            html.Label('Crime Statistics', style={'color': 'white', 'padding': 0}),
-            dcc.Dropdown(crimes_list, id='crime_dropdown', multi=True,
-                         style={'marginRight': '10px', 'width': 350, 'padding-top': 0}),
-
-
-        ], id='map_filters', style={'padding': 30, 'background': '#1C6387'}),
-
-        html.Div(children=[
-
-            html.Label('Neighbourhood Assessment Average', style={'color': '#1C6387', 'padding': 25}),
-            html.Div(children=[
-                dcc.RangeSlider(
-                    min=100000,
-                    max=1000000,
-                    step=25000,
-                    value=[150000, 450000],
-                    id='Neighbourhood_Average'),
-            ], style={'padding': '0, 20, 10', 'color': '#1C6387'}),
-
-            # Contains Map graph and progress indicator
-            html.Div([
-                dcc.Loading(
-                    dcc.Graph(id='the_graph', config={'doubleClick': 'reset', 'showTips': True, 'displayModeBar': False,
-                                                      'watermark': False}, style={'height': 550})),
-
-            ], id='map_container', style={'padding': 0, 'flex': 1}),
-
-        ], id='map_slider_container', style={'width': '55vw', 'flex': 1}),
-    ], id='top-container', style={'display': 'flex', 'flex-direction': 'row', 'height': '60vh'}),
-
-    # ================================================================================================================ #
-    # Bottom DIV
     html.Div(children=[
 
-        # Filter
         html.Div(children=[
-            html.Label('Crime Filter',
-                       style={
-                           'color': 'white',
-                           'width': 60,
-                           'font': 'Poppins',
-                           'font-size': 25,
-                           'text-align': 'center',
-                       }),
+            html.Div(children=[
+                html.Label('Moving to Edmonton Made Easy',
+                           style={
+                               'color': 'white',
+                               'padding': '30, 30, 30, 30',
+                               'width': 60,
+                               'font': 'Poppins',
+                               'font-size': 25,
+                               'text-align': 'center',
+                           }),
+                html.Br(),
+                html.Br(),
+                html.Br(),
 
-            html.Br(),
-            html.Br(),
+                html.Label('Neighbourhood Search', style={'color': 'white', 'padding-bottom': 10}),
 
-            dcc.RadioItems(
-                    labelStyle={'display': 'block'},
-                    id='general_crime',
-                    options=[{'label': k, 'value': k} for k in mapped_crime_list().keys()],
-                    value='Disorder',
-                    style={'color': 'white', 'padding': '10, 0'}
-                ),
+                dcc.Dropdown(options=neighbourhood_list,
+                             placeholder='Enter Neighbourhood', id='Neighbourhood_input',
+                             style={'marginRight': '10px', 'width': 350, 'padding-top': 10},
+                             ),
 
-            html.Hr(),
+                html.Br(),
+                html.Br(),
+                html.Label('Crime Statistics', style={'color': 'white', 'padding': 0}),
+                dcc.Dropdown(crimes_list, id='crime_dropdown', multi=True,
+                             style={'marginRight': '10px', 'width': 350, 'padding-top': 0}),
 
-            dcc.RadioItems(
-                    id='descriptive_crime', style={'color': 'white', 'display': 'inline-grid'}
-                #labelStyle={'display': 'block'},
-                ),
+
+            ], id='map_filters', style={'padding': 30, 'background': '#1C6387'}),
+
+            html.Div(children=[
+
+                html.Label('Neighbourhood Assessment Average', style={'color': '#1C6387', 'padding': 25}),
+                html.Div(children=[
+                    dcc.RangeSlider(
+                        min=100000,
+                        max=1000000,
+                        step=25000,
+                        value=[150000, 450000],
+                        id='Neighbourhood_Average'),
+                ], style={'color': '#1C6387'}),
+
+                # Contains Map graph and progress indicator
+                html.Div([
+                    dcc.Loading(
+                        dcc.Graph(id='the_graph', config={'doubleClick': 'reset', 'showTips': True, 'displayModeBar': False,
+                                                          'watermark': False}, style={'height': 550})),
+
+                ], id='map_container', style={'padding': 0, 'flex': 1}),
+
+            ], id='map_slider_container', style={'width': '55vw', 'flex': 1}),
+        ], id='top-container', style={'display': 'flex', 'flex-direction': 'row', 'height': '60vh'}),
+
+        # ================================================================================================================ #
+        # Bottom DIV
+        html.Div(children=[
+
+            # Filter
+            html.Div(children=[
+                html.Label('Greater Edmonton Crime filter',
+                           style={
+                               'color': 'white',
+                               'width': 60,
+                               'font': 'Poppins',
+                               'font-size': 25,
+                               'text-align': 'center',
+                           }),
+
+                html.Br(),
+                html.Br(),
+
+                dcc.RadioItems(
+                        labelStyle={'display': 'block'},
+                        id='general_crime',
+                        options=[{'label': k, 'value': k} for k in mapped_crime_list().keys()],
+                        value='Disorder',
+                        style={'color': 'white', 'padding': '10, 0'}
+                    ),
 
                 html.Hr(),
 
-                html.Div(id='display-selected-values')
+                dcc.RadioItems(
+                        id='descriptive_crime', style={'color': 'white', 'display': 'inline-grid'}
+                    #labelStyle={'display': 'block'},
+                    ),
 
-        ], id='crime_filters', style={'padding': 15, 'background': '#1C6387', 'position': 'relative', 'width': 390}),
+                    html.Hr(),
 
-        # Bottom Graphs
-        html.Div(children=[
+                    html.Div(id='display-selected-values')
 
-            # Crime graphs
-            dcc.Loading(
-                dcc.Graph(id='crime_cat_graph', config={'doubleClick': 'reset', 'showTips': True,
-                                                        'displayModeBar': False, 'watermark': False},
-                                                        style={'flex-grow': 1})),
-            dcc.Loading(
-                dcc.Graph(id='crime_occur_graph', config={'doubleClick': 'reset', 'showTips': True,
-                         'displayModeBar': False, 'watermark': False}, style={'flex-grow': 1, 'margin-left': 25,
-                                                                              'border-right': '1px solid #ccc',
-                                                                              'padding-right': 75})),
+            ], id='crime_filters', style={'padding': 15, 'background': '#1C6387', 'position': 'relative', 'width': 390}),
 
-            html.Hr(),
-            # html.Hr(),
-
-            # Language graph
+            # Bottom Graphs
             html.Div(children=[
-                dcc.Dropdown(options=languages_list,
-                             placeholder='Languages', id='Languages_dropdown', value='French',
-                             # style={'width': 250},
-                             ),
-                # html.Div([
+
+                # Crime graphs
                 dcc.Loading(
-                    dcc.Graph(id='language_graph', config={'doubleClick': 'reset', 'showTips': True,
-                                                           'displayModeBar': False, 'watermark': False})),
-                # style={'padding': 0, 'flex': 1, 'display': 'inline-flex', 'float': 'right'})),
-                # ], id='graphs_container', style={'padding': 0, 'flex': 1, 'display': 'inline-flex', 'float': 'right'}),
-            ], id='language-dropdown-cont', style={'flex-grow': 1, 'padding-right': 10}),
-        ], id='bottom_graphs', style={'display': 'flex', 'align-items': 'flex-end', 'width': '72vw', 'flex-wrap': 'wrap'
-                                      , 'flex-direction': 'row', 'justify-content': 'space-around'}),
+                    dcc.Graph(id='crime_cat_graph', config={'doubleClick': 'reset', 'showTips': True,
+                                                            'displayModeBar': False, 'watermark': False},
+                                                            style={'flex-grow': 1})),
+                dcc.Loading(
+                    dcc.Graph(id='crime_occur_graph', config={'doubleClick': 'reset', 'showTips': True,
+                             'displayModeBar': False, 'watermark': False}, style={'flex-grow': 1, 'margin-left': 25,
+                                                                                  'border-right': '1px solid #ccc',
+                                                                                  'padding-right': 75})),
 
-    ], id='bottom_container', style={'display': 'flex', 'flex-direction': 'row', 'height': '33.51vh',
-                                     'flex-wrap': 'wrap', 'justify-content': 'space-between', 'padding-top': 16,
-                                     'padding-bottom': 10}),
+                html.Hr(),
+                # html.Hr(),
 
+                # Language graph
+                html.Div(children=[
+                    dcc.Dropdown(options=languages_list,
+                                 placeholder='Languages', id='Languages_dropdown', value='French',
+                                 # style={'width': 250},
+                                 ),
+                    # html.Div([
+                    dcc.Loading(
+                        dcc.Graph(id='language_graph', config={'doubleClick': 'reset', 'showTips': True,
+                                                               'displayModeBar': False, 'watermark': False})),
+                    # style={'padding': 0, 'flex': 1, 'display': 'inline-flex', 'float': 'right'})),
+                    # ], id='graphs_container', style={'padding': 0, 'flex': 1, 'display': 'inline-flex', 'float': 'right'}),
+                ], id='language-dropdown-cont', style={'flex-grow': 1, 'padding-right': 10}),
+            ], id='bottom_graphs', style={'display': 'flex', 'align-items': 'flex-end', 'width': '72vw', 'flex-wrap': 'wrap'
+                                          , 'flex-direction': 'row', 'justify-content': 'space-around'}),
+
+        ], id='bottom_container', style={'display': 'flex', 'flex-direction': 'row', 'height': '33.51vh',
+                                         'flex-wrap': 'wrap', 'justify-content': 'space-between', 'padding-top': 16,
+                                         'padding-bottom': 10}),
+    ], id='main-page-container', style={'display': 'block'}),
 ], id='main-container', style={'display': 'block', 'padding': 4})
+
+# ==================================================================================================================== #
+# PAGES INTERFACE
+
+@app.callback(
+    Output('main-page-container', 'style'),
+    [Input('change_page', 'value')])
+def switch_pages(switch_to_page):
+    if switch_to_page == 'Main Page':
+        return {'display': 'block'}
+    if switch_to_page == 'Comparison':
+        return {'display': 'none'}
 
 # ==================================================================================================================== #
 # CRIME GRAPH INTERFACE
@@ -393,7 +405,7 @@ def update_output(neighbourhoodName, assessmentRange, clickData):
     # print(df_neighbourhood_average_filtered['NeighbourhoodID'])
 
     df_neighbourhood_average_filtered['color'] = 'red'
-    zoom = 9.8
+    zoom = 9.2
     center = {"lat": 53.545883, "lon": -113.490112}
 
     #click on neighbourhood
