@@ -75,6 +75,7 @@ app = Dash(__name__)
 
 app.layout = html.Div([
 
+    # Left DIV
     html.Div(children=[
         html.Div(children=[
             html.Label('Moving to Edmonton Made Easy',
@@ -106,6 +107,47 @@ app.layout = html.Div([
 
         ], id='map_filters', style={'padding': 30, 'background': '#1C6387'}),
 
+        # Filter
+        html.Div(children=[
+            html.Label('Crime Filter',
+                       style={
+                           'color': 'white',
+                           'width': 60,
+                           'font': 'Poppins',
+                           'font-size': 25,
+                           'text-align': 'center',
+                       }),
+
+            html.Br(),
+            html.Br(),
+
+            dcc.RadioItems(
+                    labelStyle={'display': 'block'},
+                    id='general_crime',
+                    options=[{'label': k, 'value': k} for k in mapped_crime_list().keys()],
+                    value='Disorder',
+                    style={'color': 'white', 'padding': '10, 0'}
+                ),
+
+            html.Hr(),
+
+            dcc.RadioItems(
+                    id='descriptive_crime', style={'color': 'white', 'display': 'block'}
+                #labelStyle={'display': 'block'},
+                ),
+
+                html.Hr(),
+
+                html.Div(id='display-selected-values')
+
+        ], id='crime_filters', style={'padding': 15, 'background': '#1C6387', 'margin-top': '10px'}),
+
+    ], id='top-container', style={'display': 'flex', 'flex-direction': 'column', 'height': '95vh', 'padding': 8}),
+
+# ==================================================================================================================== #
+    # Right DIV
+    html.Div(children=[
+
         html.Div(children=[
 
             html.Label('Neighbourhood Assessment Average', style={'color': '#1C6387', 'padding': 25}),
@@ -134,85 +176,32 @@ app.layout = html.Div([
             ], id='map_container', style={'padding': 0, 'flex': 1}),
 
         ], id='map_slider_container', style={'width': '55vw', 'flex': 1}),
-    ], id='top-container', style={'display': 'flex', 'flex-direction': 'row', 'height': '60vh'}),
 
-    # ================================================================================================================ #
-    # Bottom DIV
-    html.Div(children=[
-
-        # Filter
+        # Language graph
         html.Div(children=[
-            html.Label('Crime Filter',
-                       style={
-                           'color': 'white',
-                           'width': 60,
-                           'font': 'Poppins',
-                           'font-size': 25,
-                           'text-align': 'center',
-                       }),
-
-            html.Br(),
-            html.Br(),
-
-            dcc.RadioItems(
-                    labelStyle={'display': 'block'},
-                    id='general_crime',
-                    options=[{'label': k, 'value': k} for k in mapped_crime_list().keys()],
-                    value='Disorder',
-                    style={'color': 'white', 'padding': '10, 0'}
-                ),
-
-            html.Hr(),
-
-            dcc.RadioItems(
-                    id='descriptive_crime', style={'color': 'white', 'display': 'inline-grid'}
-                #labelStyle={'display': 'block'},
-                ),
-
-                html.Hr(),
-
-                html.Div(id='display-selected-values')
-
-        ], id='crime_filters', style={'padding': 15, 'background': '#1C6387', 'position': 'relative', 'width': 390}),
-
-        # Bottom Graphs
-        html.Div(children=[
-
-            # Crime graphs
-            dcc.Loading(
-                dcc.Graph(id='crime_cat_graph', config={'doubleClick': 'reset', 'showTips': True,
-                                                        'displayModeBar': False, 'watermark': False},
-                                                        style={'flex-grow': 1})),
-            dcc.Loading(
-                dcc.Graph(id='crime_occur_graph', config={'doubleClick': 'reset', 'showTips': True,
-                         'displayModeBar': False, 'watermark': False}, style={'flex-grow': 1, 'margin-left': 25,
-                                                                              'border-right': '1px solid #ccc',
-                                                                              'padding-right': 75})),
-
-            html.Hr(),
-            # html.Hr(),
-
-            # Language graph
             html.Div(children=[
                 dcc.Dropdown(options=languages_list,
-                             placeholder='Languages', id='Languages_dropdown', value='French',
-                             # style={'width': 250},
-                             ),
-                # html.Div([
+                     placeholder='Languages', id='Languages_dropdown', value='French',
+                     #style={'width': 250},
+                     ),
+                #html.Div([
                 dcc.Loading(
                     dcc.Graph(id='language_graph', config={'doubleClick': 'reset', 'showTips': True,
                                                            'displayModeBar': False, 'watermark': False})),
-                # style={'padding': 0, 'flex': 1, 'display': 'inline-flex', 'float': 'right'})),
-                # ], id='graphs_container', style={'padding': 0, 'flex': 1, 'display': 'inline-flex', 'float': 'right'}),
-            ], id='language-dropdown-cont', style={'flex-grow': 1, 'padding-right': 10}),
-        ], id='bottom_graphs', style={'display': 'flex', 'align-items': 'flex-end', 'width': '72vw', 'flex-wrap': 'wrap'
-                                      , 'flex-direction': 'row', 'justify-content': 'space-around'}),
+                              #style={'padding': 0, 'flex': 1, 'display': 'inline-flex', 'float': 'right'})),
+                #], id='graphs_container', style={'padding': 0, 'flex': 1, 'display': 'inline-flex', 'float': 'right'}),
+                ]),
 
-    ], id='bottom_container', style={'display': 'flex', 'flex-direction': 'row', 'height': '33.51vh',
-                                     'flex-wrap': 'wrap', 'justify-content': 'space-between', 'padding-top': 16,
-                                     'padding-bottom': 10}),
+            # Crime graphs
+            dcc.Graph(id='crime_cat_graph', config={'doubleClick': 'reset', 'showTips': True, 'displayModeBar': False,
+                                                          'watermark': False}),
+            dcc.Graph(id='crime_occur_graph', config={'doubleClick': 'reset', 'showTips': True, 'displayModeBar': False,
+                                                          'watermark': False}),
+        ], id='bottom_graphs', style={'display': 'flex', 'align-items': 'flex-end', 'flex-direction': 'row-reverse',
+                                      'justify-content': 'space-evenly'}),
+    ], id='bottom_container', style={'display': 'flex', 'flex-direction': 'column', 'padding': 8, 'height': '33.51vh'}),
 
-], id='main-container', style={'display': 'block', 'padding': 4})
+], id='main-container', style={'display': 'block'})
 
 # ==================================================================================================================== #
 # CRIME GRAPH INTERFACE
@@ -461,7 +450,7 @@ def update_output(neighbourhoodName, assessmentRange, clickData):
                                mapbox_style='open-street-map',
                                zoom=zoom,
                                center=center,
-                               height=538, opacity=0.25,
+                               height=550, opacity=0.25,
                                hover_data={'color': False, 'Assessed Value': True, 'NeighbourhoodID': True},
                                hover_name='NeighbourhoodName',
                                color_discrete_map={'green': "green", 'yellow': 'yellow', "red": 'purple'},
