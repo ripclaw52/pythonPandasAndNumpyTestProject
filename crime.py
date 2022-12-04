@@ -197,6 +197,6 @@ def update_crime_occur_graph(descriptive_crime):
     return group_type(descriptive_crime)
    
 
-if __name__ == '__main__':
+if __name__ == '__crime__':
     app.run_server(debug=True)
     

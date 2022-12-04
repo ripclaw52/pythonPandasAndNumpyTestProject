@@ -44,7 +44,16 @@ def create_graph_languages(value):
     value_list = values[::-1]
     #print(f"{len(column_headers)} & {len(value_list)}")
 
-    fig = go.Figure(data=[go.Bar(x=value_list, y=column_headers, orientation="h")])
+    fig = go.Figure(
+        data=[go.Bar(
+            x=value_list,
+            y=column_headers,
+            orientation="h",)
+        ],
+        layout=go.Layout(margin=dict(l=5, r=5, t=35, b=5)),
+    )
+    config = dict({'displayModeBar': False})
+
     return fig
 
 def create_average_assessment(value):
@@ -52,40 +61,14 @@ def create_average_assessment(value):
     df = pd.read_csv(assessment_file)
     dff = df.query("`Neighbourhood`==@value & `Assessment Class % 1`==100 & `Assessment Class 1`==@residential")["Assessed Value"]
     average = dff.mean()
-    return average
+    currency_string = "${:,.2f}".format(average)
+    return currency_string
 
-def create_graph_assessment(value):
-    residential = "RESIDENTIAL"
-    df = pd.read_csv(assessment_file)
-    dff = df.query("`Neighbourhood`==@value & `Assessment Class % 1`==100 & `Assessment Class 1`==@residential")["Assessed Value"]
+#===============================================================================================
 
-    intervals = ["Less than 200K", "200K - 300K", "300K - 400K", "400K - 500K",
-                 "500K - 600K", "600K - 700K", "700K - 800K", "More than 800K"]
-    median = [0, 0, 0, 0,
-             0, 0, 0, 0]
-    for key in dff:
-        if ( key < 200000):
-            median[0] += 1
-        elif (300000 > key >= 200000):
-            median[1] += 1
-        elif (400000 > key >= 300000):
-            median[2] += 1
-        elif (500000 > key >= 400000):
-            median[3] += 1
-        elif (600000 > key >= 500000):
-            median[4] += 1
-        elif (700000 > key >= 600000):
-            median[5] += 1
-        elif (800000 > key >= 700000):
-            median[6] += 1
-        else:
-            median[7] += 1
-
-    fig = go.Figure(
-        data=[go.Bar(y=intervals, x=median, orientation="h")],
-    )
-    #fig.update_yaxes(ticklabelposition="inside top", title=None)
-    return fig
+# colours
+bg_assessedValue = "#1C6387"
+fg_assessedValue = "white"
 
 #===================================================================================================================
 
@@ -95,11 +78,12 @@ app = Dash(__name__)
 app.layout = html.Div([
     # put map here
 
+
+
     # comparison
     html.Div([
         html.Div([
             html.Div([
-            "Neighbourhood 1",
             dcc.Dropdown(
                 neighbourhood_list,
                 multi=False,
@@ -110,15 +94,15 @@ app.layout = html.Div([
             ),
         ], style={}),
             html.Div([
+                html.Div([
+                    html.Div(id='a_text1', style={ 'color':fg_assessedValue }),
+                ], style={ 'margin':'25px', 'padding':'25px', 'border-radius':'10px', 'text-align':'center', 'background-color':bg_assessedValue }),
                 dcc.Graph(id='l_graph1'),
-                html.Div(id='a_text1'),
-                dcc.Graph(id='a_graph1'),
             ]),
         ], style={ 'margin':'25px', 'display':'flex', 'flex-direction':'column', 'width':'100%', }),
 
         html.Div([
             html.Div([
-            "Neighbourhood 2",
             dcc.Dropdown(
                 neighbourhood_list,
                 multi=False,
@@ -129,15 +113,15 @@ app.layout = html.Div([
             ),
         ], style={}),
             html.Div([
+                html.Div([
+                    html.Div(id='a_text2', style={ 'color':fg_assessedValue })
+                ], style={ 'margin':'25px', 'padding':'25px', 'border-radius':'10px', 'text-align':'center', 'background-color':bg_assessedValue }),
                 dcc.Graph(id='l_graph2'),
-                html.Div(id='a_text2'),
-                dcc.Graph(id='a_graph2'),
             ]),
         ], style={ 'margin':'25px', 'display':'flex', 'flex-direction':'column', 'width':'100%', }),
 
         html.Div([
             html.Div([
-            "Neighbourhood 3",
             dcc.Dropdown(
                 neighbourhood_list,
                 multi=False,
@@ -148,9 +132,10 @@ app.layout = html.Div([
             ),
         ], style={}),
             html.Div([
+                html.Div([
+                    html.Div(id='a_text3', style={ 'color':fg_assessedValue })
+                ], style={ 'margin':'25px', 'padding':'25px', 'border-radius':'10px', 'text-align':'center', 'background-color':bg_assessedValue }),
                 dcc.Graph(id='l_graph3'),
-                html.Div(id='a_text3'),
-                dcc.Graph(id='a_graph3'),
             ]),
         ], style={ 'margin':'25px', 'display':'flex', 'flex-direction':'column', 'width':'100%', }),
     ], style={'margin': '25px', 'display': 'flex', 'flex-direction': 'row', })
@@ -158,58 +143,49 @@ app.layout = html.Div([
 
 
 @app.callback(
-    [Output('l_graph1', 'figure'),
-     Output('a_text1', 'children'),
-     Output('a_graph1', 'figure'),],
+    [Output('a_text1', 'children'),
+     Output('l_graph1', 'figure'),],
     [Input('dd_selection1', 'value')])
 def update_output(selection):
     default = "CRESTWOOD"
     if (selection == None):
-        o3 = create_graph_languages(default)
-        o2 = create_average_assessment(default)
-        o1 = create_graph_assessment(default)
+        o2 = create_graph_languages(default)
+        o1 = create_average_assessment(default)
     else:
-        o3 = create_graph_languages(selection)
-        o2 = create_average_assessment(selection)
-        o1 = create_graph_assessment(selection)
+        o2 = create_graph_languages(selection)
+        o1 = create_average_assessment(selection)
 
-    return o1, o2, o3
+    return o1, o2
 
 @app.callback(
-    [Output('l_graph2', 'figure'),
-     Output('a_text2', 'children'),
-     Output('a_graph2', 'figure'),],
+    [Output('a_text2', 'children'),
+     Output('l_graph2', 'figure'),],
     [Input('dd_selection2', 'value')])
 def update_output(selection):
     default = "RIVERDALE"
     if (selection == None):
-        o3 = create_graph_languages(default)
-        o2 = create_average_assessment(default)
-        o1 = create_graph_assessment(default)
+        o2 = create_graph_languages(default)
+        o1 = create_average_assessment(default)
     else:
-        o3 = create_graph_languages(selection)
-        o2 = create_average_assessment(selection)
-        o1 = create_graph_assessment(selection)
+        o2 = create_graph_languages(selection)
+        o1 = create_average_assessment(selection)
 
-    return o1, o2, o3
+    return o1, o2
 
 @app.callback(
-    [Output('l_graph3', 'figure'),
-     Output('a_text3', 'children'),
-     Output('a_graph3', 'figure'),],
+    [Output('a_text3', 'children'),
+     Output('l_graph3', 'figure'),],
     [Input('dd_selection3', 'value')])
 def update_output(selection):
     default = "MACEWAN"
     if (selection == None):
-        o3 = create_graph_languages(default)
-        o2 = create_average_assessment(default)
-        o1 = create_graph_assessment(default)
+        o2 = create_graph_languages(default)
+        o1 = create_average_assessment(default)
     else:
-        o3 = create_graph_languages(selection)
-        o2 = create_average_assessment(selection)
-        o1 = create_graph_assessment(selection)
+        o2 = create_graph_languages(selection)
+        o1 = create_average_assessment(selection)
 
-    return o1, o2, o3
+    return o1, o2
 
 if __name__ == '__main__':
     app.run_server(debug=True)
