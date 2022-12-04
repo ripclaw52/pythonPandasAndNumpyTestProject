@@ -1,3 +1,4 @@
+import daq as daq
 import pandas as pd
 import json
 import plotly.express as px
@@ -76,6 +77,15 @@ app = Dash(__name__)
 app.layout = html.Div([
 
     html.Div(children=[
+
+        # html.Div(children=[
+        #     dcc.RadioItems(['Residential', 'Commercial']),
+        # ], style={'text-align-last': 'end', 'color': '#1C6387'}),
+        html.Div([
+            daq.BooleanSwitch(id='my-boolean-switch', on=False),
+            html.Div(id='boolean-switch-output-1')
+        ]),
+
         html.Div(children=[
             html.Label('Moving to Edmonton Made Easy',
                        style={
@@ -117,13 +127,6 @@ app.layout = html.Div([
                     value=[150000, 450000],
                     id='Neighbourhood_Average'),
             ], style={'padding': '0, 20, 10', 'color': '#1C6387'}),
-
-            # html.Br(),
-            # dcc.RadioItems(['Residential', 'Commercial']),
-
-            # html.Div(children=[
-            #     dcc.RadioItems(['Residential', 'Commercial']),
-            # ], style={'text-align-last': 'end', 'color': '#1C6387'}),
 
             # Contains Map graph and progress indicator
             html.Div([
@@ -233,23 +236,6 @@ def general_crimes(general_crime):
     dfg = new_df.groupby('Occurrence_Group').count().reset_index()
     dfg = dfg.rename(columns={"Occurrence_Type_Group": "Occurrences"})
 
-    # plot structure
-    # fig = px.bar(dfg,
-    #              y='Occurrence_Group',
-    #              x='Occurrences',
-    #              title=general_crime + " Last 90 Days",
-    #              barmode='stack',
-    #              text="Occurrences",
-    #              orientation='h')
-    #
-    # fig.update_layout(xaxis={'categoryorder': 'total descending'})  # add only this line
-    # fig.update_traces(marker_color='rgb(158,202,225)', marker_line_color='rgb(8,48,107)',
-    #                   marker_line_width=1.5, opacity=0.6)
-    #
-    # fig.update_layout(xaxis_title="Occurrences", yaxis_title="", )
-    #
-    # return fig
-# =============================================================================================
     barchart = px.bar(
         data_frame=dfg,
         x='Occurrences',
@@ -294,22 +280,6 @@ def update_crime_occur_graph(descriptive_crime):
     dfg = new_df.groupby('Occurrence_Type_Group').count().reset_index()
     dfg = dfg.rename(columns={"Occurrence_Type_Group": "occurences"})
 
-    # plot structure
-    # fig = px.bar(dfg,
-    #              x='Occurrence_Group',
-    #              y='occurences',
-    #              title=f"{descriptive_crime}" + " Last 90 Days",
-    #              barmode='stack',
-    #              text="Occurrence_Group",
-    #              orientation='h'
-    #              )
-    #
-    # fig.update_layout(xaxis={'categoryorder': 'total descending'})  # add only this line
-    # fig.update_traces(marker_color='rgb(8, 143, 143)', marker_line_color='rgb(8,48,107)',
-    #                   marker_line_width=1.5, opacity=0.6)
-    #
-    # fig.update_layout(xaxis_title="Occurences", yaxis_title="", )
-#===========================================================================
     barchart = px.bar(
         data_frame=dfg,
         x='Occurrence_Group',
@@ -343,13 +313,6 @@ def update_crime_occur_graph(descriptive_crime):
     barchart.update_layout(yaxis={'categoryorder': 'total ascending'})
     barchart.update_traces(textposition='outside')
     return barchart
-# @app.callback(
-#     Output(),
-#     Input())
-# def crime_output():
-#     df_crimes = pd.read_csv('Occurrences_Last_90_Days.csv', low_memory=False)
-#     df_crimes_category = df_crimes.groupby(['Occurrence_Category'], as_index=False).size()
-
 
 # ==================================================================================================================== #
 # LANGUAGE GRAPH INTERFACE
