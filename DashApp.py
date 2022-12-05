@@ -89,37 +89,64 @@ languages_file = "./source-files/2016_Census_-_Dwelling_Unit_by_Language__Neighb
 def create_graph_languages(value):
     df = pd.read_csv(languages_file)
     dff = df.loc[df['Neighbourhood'] == value]
-    headers = list(dff.columns.values)[4:14]
-    values = [
-        dff.iloc[0,  4], dff.iloc[0,  5], dff.iloc[0,  6], dff.iloc[0,  7],
-        dff.iloc[0,  8], dff.iloc[0,  9], dff.iloc[0, 10], dff.iloc[0, 11],
-        dff.iloc[0, 12], dff.iloc[0, 13],
-    ]
-    column_headers = headers[::-1]
-    value_list = values[::-1]
-    #print(f"{len(column_headers)} & {len(value_list)}")
+    if (len(dff.index) == 0):
+        return html.Div(
+            html.H3(f"No records found for Neighbourhood: {value.title()}",
+                    style={'margin': '5px',
+                           'padding': '50px',
+                           'border-radius': '10px',
+                           'text-align': 'center',
+                           'color': '#636EFA',
+                           'background-color': '#E5ECF6'}
+                    )
+        )
+    else:
+        headers = list(dff.columns.values)[4:14]
+        values = [
+            dff.iloc[0,  4], dff.iloc[0,  5], dff.iloc[0,  6], dff.iloc[0,  7],
+            dff.iloc[0,  8], dff.iloc[0,  9], dff.iloc[0, 10], dff.iloc[0, 11],
+            dff.iloc[0, 12], dff.iloc[0, 13],
+        ]
+        column_headers = headers[::-1]
+        value_list = values[::-1]
 
-    fig = go.Figure(
-        data=[go.Bar(
-            x=value_list,
-            y=column_headers,
-            orientation="h",
-        )],
-        layout=go.Layout(
-            title=f"Languages per household in {value.title()}",
-            margin=dict(l=5, r=5, t=35, b=5)),
-    )
-    config = dict({'displayModeBar': False})
+        state = all([val == 0 for val in values])
+        #print(f"{len(column_headers)} & {len(value_list)}")
 
-    return fig
+        if (state == False):
+            fig = go.Figure(
+                data=[go.Bar(
+                    x=value_list,
+                    y=column_headers,
+                    orientation="h",
+                )],
+                layout=go.Layout(
+                    title=f"Languages per household in {value.title()}",
+                    margin=dict(l=5, r=5, t=35, b=5)),
+            )
+            return dcc.Graph(figure=fig, config=dict({'displayModeBar': False}))
+        else:
+            return html.Div(
+                html.H3(f"No languages listed in Neighbourhood: {value.title()}",
+                        style={'margin': '5px',
+                               'padding': '50px',
+                               'border-radius': '10px',
+                               'text-align': 'center',
+                               'color': '#636EFA',
+                               'background-color': '#E5ECF6'}
+                        )
+            )
+
 
 def create_average_assessment(value):
     residential = "RESIDENTIAL"
     df = pd.read_csv(assessment_file)
     dff = df.query("`Neighbourhood`==@value & `Assessment Class % 1`==100 & `Assessment Class 1`==@residential")["Assessed Value"]
-    average = dff.mean()
-    currency_string = "${:,.2f}".format(average)
-    return currency_string
+    if (len(dff.index)==0): return "$0.00"
+    else:
+        average = dff.mean()
+        currency_string = "${:,.2f}".format(average)
+        return currency_string
 
 # ==================================================================================================================== #
 # DASH APP INTERFACE SETUP
@@ -292,10 +319,15 @@ app.layout = html.Div([
             html.Div([
                 html.Div([
                     html.Div("Average Assessement Value", style={ 'margin-bottom':'50px', 'color':fg_assessedValue }),
-                    html.H2(id='a_text1', style={ 'color':fg_assessedValue }),
+                    dcc.Loading(
+                        html.H2(id='a_text1', style={ 'color':fg_assessedValue })
+                    )
                 ], style={ 'margin':'25px', 'padding':'25px', 'border-radius':'10px', 'text-align':'center',
                            'background-color':bg_assessedValue }),
-                dcc.Graph(id='l_graph1', config=dict({'displayModeBar': False})),
+                dcc.Loading(
+                    html.Div(id='l_graph1')
+                ),
+                #dcc.Graph(id='l_graph1', config=dict({'displayModeBar': False})),
             ]),
         ], style={ 'margin':'25px', 'display':'flex', 'flex-direction':'column', 'width':'100%', }),
 
@@ -314,9 +346,14 @@ app.layout = html.Div([
             html.Div([
                 html.Div([
                     html.Div("Average Assessement Value", style={ 'margin-bottom':'50px', 'color':fg_assessedValue }),
-                    html.H2(id='a_text2', style={ 'color':fg_assessedValue })
+                    dcc.Loading(
+                        html.H2(id='a_text2', style={ 'color':fg_assessedValue })
+                    )
                 ], style={ 'margin':'25px', 'padding':'25px', 'border-radius':'10px', 'text-align':'center', 'background-color':bg_assessedValue }),
-                dcc.Graph(id='l_graph2', config=dict({'displayModeBar': False})),
+                dcc.Loading(
+                    html.Div(id='l_graph2')
+                ),
+                #dcc.Graph(id='l_graph2', config=dict({'displayModeBar': False})),
             ]),
         ], style={ 'margin':'25px', 'display':'flex', 'flex-direction':'column', 'width':'100%', }),
 
@@ -335,10 +372,15 @@ app.layout = html.Div([
             html.Div([
                 html.Div([
                     html.Div("Average Assessement Value", style={ 'margin-bottom':'50px', 'color':fg_assessedValue }),
-                    html.H2(id='a_text3', style={ 'color':fg_assessedValue })
+                    dcc.Loading(
+                        html.H2(id='a_text3', style={ 'color':fg_assessedValue })
+                    )
                 ], style={ 'margin':'25px', 'padding':'25px', 'border-radius':'10px', 'text-align':'center',
                            'background-color':bg_assessedValue }),
-                dcc.Graph(id='l_graph3', config=dict({'displayModeBar': False})),
+                dcc.Loading(
+                    html.Div(id='l_graph3')
+                ),
+                #dcc.Graph(id='l_graph3', config=dict({'displayModeBar': False})),
             ]),
         ], style={ 'margin':'25px', 'display':'flex', 'flex-direction':'column', 'width':'100%', }),
     ], id='comparison-page-container',
@@ -611,7 +653,7 @@ def update_output(neighbourhoodName, assessmentRange, clickData, crime_dropdown)
 
 @app.callback(
     [Output('a_text1', 'children'),
-     Output('l_graph1', 'figure'),],
+     Output('l_graph1', 'children'),],
     [Input('dd_selection1', 'value')])
 def update_output1(selection):
     default = "CRESTWOOD"
@@ -626,7 +668,7 @@ def update_output1(selection):
 
 @app.callback(
     [Output('a_text2', 'children'),
-     Output('l_graph2', 'figure'),],
+     Output('l_graph2', 'children'),],
     [Input('dd_selection2', 'value')])
 def update_output2(selection):
     default = "RIVERDALE"
@@ -641,7 +683,7 @@ def update_output2(selection):
 
 @app.callback(
     [Output('a_text3', 'children'),
-     Output('l_graph3', 'figure'),],
+     Output('l_graph3', 'children'),],
     [Input('dd_selection3', 'value')])
 def update_output3(selection):
     default = "MACEWAN"
