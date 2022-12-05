@@ -1,6 +1,7 @@
 import pandas as pd
 import json
 import plotly.express as px
+import plotly.graph_objects as go
 from dash import Dash, html, dcc, Input, Output
 
 # ==================================================================================================================== #
@@ -82,6 +83,41 @@ with open('./source-files/City of Edmonton - Neighbourhoods.geojson', 'r') as f:
 # colours
 bg_assessedValue = "#1C6387"
 fg_assessedValue = "white"
+crime_file = "./source-files/Occurrences_Last_90_Days.csv"
+assessment_file = "./source-files/Property_Assessment_Data__Current_Calendar_Year_.csv"
+languages_file = "./source-files/2016_Census_-_Dwelling_Unit_by_Language__Neighbourhood_Ward_.csv"
+def create_graph_languages(value):
+    df = pd.read_csv(languages_file)
+    dff = df.loc[df['Neighbourhood'] == value]
+    headers = list(dff.columns.values)[4:14]
+    values = [
+        dff.iloc[0,  4], dff.iloc[0,  5], dff.iloc[0,  6], dff.iloc[0,  7],
+        dff.iloc[0,  8], dff.iloc[0,  9], dff.iloc[0, 10], dff.iloc[0, 11],
+        dff.iloc[0, 12], dff.iloc[0, 13],
+    ]
+    column_headers = headers[::-1]
+    value_list = values[::-1]
+    #print(f"{len(column_headers)} & {len(value_list)}")
+
+    fig = go.Figure(
+        data=[go.Bar(
+            x=value_list,
+            y=column_headers,
+            orientation="h",)
+        ],
+        layout=go.Layout(margin=dict(l=5, r=5, t=35, b=5)),
+    )
+    config = dict({'displayModeBar': False})
+
+    return fig
+
+def create_average_assessment(value):
+    residential = "RESIDENTIAL"
+    df = pd.read_csv(assessment_file)
+    dff = df.query("`Neighbourhood`==@value & `Assessment Class % 1`==100 & `Assessment Class 1`==@residential")["Assessed Value"]
+    average = dff.mean()
+    currency_string = "${:,.2f}".format(average)
+    return currency_string
 
 # ==================================================================================================================== #
 # DASH APP INTERFACE SETUP
@@ -566,6 +602,51 @@ def update_output(neighbourhoodName, assessmentRange, clickData, crime_dropdown)
     fig.update_layout(coloraxis_showscale=False, margin={"r": 0, "t": 20, "l": 20, "b": 20})
     return fig, df_neighbourhood_average_filtered['NeighbourhoodName'].unique()
 
+
+@app.callback(
+    [Output('a_text1', 'children'),
+     Output('l_graph1', 'figure'),],
+    [Input('dd_selection1', 'value')])
+def update_output1(selection):
+    default = "CRESTWOOD"
+    if (selection == None):
+        o2 = create_graph_languages(default)
+        o1 = create_average_assessment(default)
+    else:
+        o2 = create_graph_languages(selection)
+        o1 = create_average_assessment(selection)
+
+    return o1, o2
+
+@app.callback(
+    [Output('a_text2', 'children'),
+     Output('l_graph2', 'figure'),],
+    [Input('dd_selection2', 'value')])
+def update_output2(selection):
+    default = "RIVERDALE"
+    if (selection == None):
+        o2 = create_graph_languages(default)
+        o1 = create_average_assessment(default)
+    else:
+        o2 = create_graph_languages(selection)
+        o1 = create_average_assessment(selection)
+
+    return o1, o2
+
+@app.callback(
+    [Output('a_text3', 'children'),
+     Output('l_graph3', 'figure'),],
+    [Input('dd_selection3', 'value')])
+def update_output3(selection):
+    default = "MACEWAN"
+    if (selection == None):
+        o2 = create_graph_languages(default)
+        o1 = create_average_assessment(default)
+    else:
+        o2 = create_graph_languages(selection)
+        o1 = create_average_assessment(selection)
+
+    return o1, o2
 
 if __name__ == '__main__':
     app.run_server(debug=True)
