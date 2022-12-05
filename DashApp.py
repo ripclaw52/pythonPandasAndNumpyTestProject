@@ -154,18 +154,18 @@ app.layout = html.Div([
                 html.Br(),
                 html.Br(),
 
-                html.Label('Neighbourhoods Within Assessment Range', style={'color': 'white', 'padding-bottom': 10}),
+                html.Label('Neighbourhoods Within Assessment Range', style={'color': 'white', 'margin-bottom': 8}),
 
                 dcc.Dropdown(options=neighbourhood_list,
                              placeholder='Enter Neighbourhood', id='Neighbourhood_input',
-                             style={'marginRight': '10px', 'width': 350, 'padding-top': 10},
+                             style={'marginRight': '10px', 'width': 350},
                              ),
 
                 html.Br(),
                 html.Br(),
-                html.Label('Crime Statistics', style={'color': 'white', 'padding': 0}),
+                html.Label('Crime Statistics', style={'color': 'white', 'margin-bottom': 8}),
                 dcc.Dropdown(crimes_list, id='crime_dropdown', multi=True,
-                             style={'marginRight': '10px', 'width': 350, 'padding-top': 0}),
+                             style={'marginRight': '10px', 'width': 350}),
 
             ], id='map_filters', style={'padding': 30, 'background': '#1C6387'}),
 
@@ -254,7 +254,7 @@ app.layout = html.Div([
                 # Language graph
                 html.Div(children=[
                     dcc.Dropdown(options=languages_list,
-                                 placeholder='Languages', id='Languages_dropdown', value='French',
+                                 placeholder='Languages', id='Languages_dropdown', value='French', clearable=False,
                                  # style={'width': 250},
                                  ),
                     # html.Div([
@@ -281,6 +281,7 @@ app.layout = html.Div([
                 neighbourhood_list,
                 multi=False,
                 searchable=True,
+                clearable=False,
                 placeholder="Select a neighbourhood",
                 id='dd_selection1',
                 value="CRESTWOOD",
@@ -301,6 +302,7 @@ app.layout = html.Div([
                 neighbourhood_list,
                 multi=False,
                 searchable=True,
+                clearable=False,
                 placeholder="Select a neighbourhood",
                 id='dd_selection2',
                 value="RIVERDALE",
@@ -320,6 +322,7 @@ app.layout = html.Div([
                 neighbourhood_list,
                 multi=False,
                 searchable=True,
+                clearable=False,
                 placeholder="Select a neighbourhood",
                 id='dd_selection3',
                 value="MACEWAN",
@@ -548,9 +551,8 @@ def update_output(neighbourhoodName, assessmentRange, clickData, crime_dropdown)
     # click on neighbourhood
     if clickData:
         click_location = clickData['points'][0]['location']
-        print(click_location)
         click_filter = df_neighbourhood_average_filtered['NeighbourhoodID'] == click_location
-        print(click_filter)
+        df_neighbourhood_average_filtered.loc[click_filter, 'Legend'] = 'Clicked Neighbourhood'
         df_neighbourhood_average_filtered.loc[click_filter, 'color'] = 'yellow'
         center = {"lat": clickData['points'][0]['customdata'][3], "lon": clickData['points'][0]['customdata'][2]}
         zoom = 13.3
@@ -558,7 +560,6 @@ def update_output(neighbourhoodName, assessmentRange, clickData, crime_dropdown)
     # highlight neighbourhood name selected.
     if neighbourhoodName:
         select_name_filter = df_neighbourhood_average_filtered['NeighbourhoodName'] == neighbourhoodName
-        print(select_name_filter)
         df_neighbourhood_average_filtered.loc[select_name_filter, 'Legend'] = 'Selected Neighbourhood'
 
     # ================================================================================================================ #
@@ -576,8 +577,8 @@ def update_output(neighbourhoodName, assessmentRange, clickData, crime_dropdown)
                                height=538, opacity=0.25,
                                hover_data={'Legend': False, 'AssessedValue': True, 'NeighbourhoodID': True},
                                hover_name='NeighbourhoodName',
-                               color_discrete_map={'Selected Neighbourhood': 'green', 'Clicked Neighbourhood': 'yellow',
-                                                   'Neighbourhoods': 'purple'},
+                               color_discrete_map={'Searched Neighbourhood': 'green',
+                                                   'Selected Neighbourhood': 'yellow', 'Neighbourhoods': 'purple'},
                                custom_data=['NeighbourhoodName', 'AssessedValue', 'Longitude', 'Latitude'],
                                )
 
