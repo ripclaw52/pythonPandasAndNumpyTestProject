@@ -8,7 +8,7 @@ pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 # ==================================================================================================================== #
-# DATAFRAMES AND DATA PREPROCESSING
+# MAIN PAGE DATAFRAMES AND DATA PREPROCESSING
 # ==================================================================================================================== #
 # CRIMES DATAFRAME
 df_crimes = pd.read_csv('./source-files/Occurrences_Last_90_Days.csv', low_memory=False)
@@ -53,7 +53,8 @@ crimes_color_map = dict(zip(crimes_list, px.colors.qualitative.G10))
 
 # ==================================================================================================================== #
 # LANGUAGES DATAFRAME
-df_languages = pd.read_csv("./source-files/2016_Census_-_Dwelling_Unit_by_Language__Neighbourhood_Ward_.csv", low_memory=False)
+df_languages = pd.read_csv("./source-files/2016_Census_-_Dwelling_Unit_by_Language__Neighbourhood_Ward_.csv",
+                           low_memory=False)
 languages_list = df_languages.columns.values[4:14]
 # print(languages_list)
 
@@ -61,9 +62,7 @@ languages_list = df_languages.columns.values[4:14]
 # ASSESSMENT VALUE DATAFRAME
 df_assessments = pd.read_csv('./source-files/Property_Assessment_Data_2022.csv', low_memory=False)
 df_assessments = df_assessments[(df_assessments['Assessment Class 1'] == 'RESIDENTIAL')]
-df_neighbourhood_average = \
-    df_assessments.groupby(['Neighbourhood', 'Neighbourhood ID'],
-                           as_index=False)[
+df_neighbourhood_average = df_assessments.groupby(['Neighbourhood', 'Neighbourhood ID'], as_index=False)[
         ['Assessed Value', 'Latitude', 'Longitude']].mean()
 
 min_value = df_neighbourhood_average.min()[1]
@@ -76,6 +75,13 @@ neighbourhood_list = df_assessments['Neighbourhood'].unique()
 # set 'neighbourhood' as a global value to avoid loading same data everytime
 with open('./source-files/City of Edmonton - Neighbourhoods.geojson', 'r') as f:
     neighbourhood = json.load(f)
+
+# ==================================================================================================================== #
+# COMPARISON PAGE DATAFRAMES AND SETUP
+# ==================================================================================================================== #
+# colours
+bg_assessedValue = "#1C6387"
+fg_assessedValue = "white"
 
 # ==================================================================================================================== #
 # DASH APP INTERFACE SETUP
@@ -94,6 +100,7 @@ app.layout = html.Div([
                        id='change_page')
     ]),
 
+    # MAIN PAGE
     html.Div(children=[
 
         html.Div(children=[
@@ -150,7 +157,7 @@ app.layout = html.Div([
             ], id='map_slider_container', style={'width': '55vw', 'flex': 1}),
         ], id='top-container', style={'display': 'flex', 'flex-direction': 'row', 'height': '60vh'}),
 
-        # ================================================================================================================ #
+        # ============================================================================================================ #
         # Bottom DIV
         html.Div(children=[
 
@@ -229,6 +236,70 @@ app.layout = html.Div([
                                          'flex-wrap': 'wrap', 'justify-content': 'space-between', 'padding-top': 16,
                                          'padding-bottom': 10}),
     ], id='main-page-container', style={'display': 'block'}),
+
+    # COMPARISON
+    html.Div(children=[
+        html.Div([
+            html.Div([
+            dcc.Dropdown(
+                neighbourhood_list,
+                multi=False,
+                searchable=True,
+                placeholder="Select a neighbourhood",
+                id='dd_selection1',
+                value="CRESTWOOD",
+            ),
+        ], style={}),
+            html.Div([
+                html.Div([
+                    html.Div(id='a_text1', style={ 'color':fg_assessedValue }),
+                ], style={ 'margin':'25px', 'padding':'25px', 'border-radius':'10px', 'text-align':'center',
+                           'background-color':bg_assessedValue }),
+                dcc.Graph(id='l_graph1'),
+            ]),
+        ], style={ 'margin':'25px', 'display':'flex', 'flex-direction':'column', 'width':'100%', }),
+
+        html.Div([
+            html.Div([
+            dcc.Dropdown(
+                neighbourhood_list,
+                multi=False,
+                searchable=True,
+                placeholder="Select a neighbourhood",
+                id='dd_selection2',
+                value="RIVERDALE",
+            ),
+        ], style={}),
+            html.Div([
+                html.Div([
+                    html.Div(id='a_text2', style={ 'color':fg_assessedValue })
+                ], style={ 'margin':'25px', 'padding':'25px', 'border-radius':'10px', 'text-align':'center', 'background-color':bg_assessedValue }),
+                dcc.Graph(id='l_graph2'),
+            ]),
+        ], style={ 'margin':'25px', 'display':'flex', 'flex-direction':'column', 'width':'100%', }),
+
+        html.Div([
+            html.Div([
+            dcc.Dropdown(
+                neighbourhood_list,
+                multi=False,
+                searchable=True,
+                placeholder="Select a neighbourhood",
+                id='dd_selection3',
+                value="MACEWAN",
+            ),
+        ], style={}),
+            html.Div([
+                html.Div([
+                    html.Div(id='a_text3', style={ 'color':fg_assessedValue })
+                ], style={ 'margin':'25px', 'padding':'25px', 'border-radius':'10px', 'text-align':'center',
+                           'background-color':bg_assessedValue }),
+                dcc.Graph(id='l_graph3'),
+            ]),
+        ], style={ 'margin':'25px', 'display':'flex', 'flex-direction':'column', 'width':'100%', }),
+    ], id='comparison-page-container',
+        style={'margin': '25px', 'display': 'flex', 'flex-direction': 'row', 'z-index': -1})
+
 ], id='main-container', style={'display': 'block', 'padding': 4})
 
 
@@ -244,6 +315,14 @@ def switch_pages(switch_to_page):
     if switch_to_page == 'Comparison':
         return {'display': 'none'}
 
+@app.callback(
+    Output('comparison-page-container', 'style'),
+    [Input('change_page', 'value')])
+def switch_pages1(switch_to_page):
+    if switch_to_page == 'Comparison':
+        return {'display': 'flex'}
+    if switch_to_page == 'Main Page':
+        return {'display': 'none'}
 
 # ==================================================================================================================== #
 # CRIME GRAPH INTERFACE
@@ -461,7 +540,8 @@ def update_output(neighbourhoodName, assessmentRange, clickData, crime_dropdown)
                                height=538, opacity=0.25,
                                hover_data={'Legend': False, 'AssessedValue': True, 'NeighbourhoodID': True},
                                hover_name='NeighbourhoodName',
-                               color_discrete_map={'green': "green", 'yellow': 'yellow', "red": 'purple'},
+                               color_discrete_map={'Selected Neighbourhood': 'green', 'Clicked Neighbourhood': 'yellow',
+                                                   'Neighbourhoods': 'purple'},
                                custom_data=['NeighbourhoodName', 'AssessedValue', 'Longitude', 'Latitude'],
                                )
 
