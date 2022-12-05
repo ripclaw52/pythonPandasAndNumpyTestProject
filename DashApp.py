@@ -103,9 +103,11 @@ def create_graph_languages(value):
         data=[go.Bar(
             x=value_list,
             y=column_headers,
-            orientation="h",)
-        ],
-        layout=go.Layout(margin=dict(l=5, r=5, t=35, b=5)),
+            orientation="h",
+        )],
+        layout=go.Layout(
+            title=f"Languages per household in {value.title()}",
+            margin=dict(l=5, r=5, t=35, b=5)),
     )
     config = dict({'displayModeBar': False})
 
@@ -289,10 +291,11 @@ app.layout = html.Div([
         ], style={}),
             html.Div([
                 html.Div([
-                    html.Div(id='a_text1', style={ 'color':fg_assessedValue }),
+                    html.Div("Average Assessement Value", style={ 'margin-bottom':'50px', 'color':fg_assessedValue }),
+                    html.H2(id='a_text1', style={ 'color':fg_assessedValue }),
                 ], style={ 'margin':'25px', 'padding':'25px', 'border-radius':'10px', 'text-align':'center',
                            'background-color':bg_assessedValue }),
-                dcc.Graph(id='l_graph1'),
+                dcc.Graph(id='l_graph1', config=dict({'displayModeBar': False})),
             ]),
         ], style={ 'margin':'25px', 'display':'flex', 'flex-direction':'column', 'width':'100%', }),
 
@@ -310,9 +313,10 @@ app.layout = html.Div([
         ], style={}),
             html.Div([
                 html.Div([
-                    html.Div(id='a_text2', style={ 'color':fg_assessedValue })
+                    html.Div("Average Assessement Value", style={ 'margin-bottom':'50px', 'color':fg_assessedValue }),
+                    html.H2(id='a_text2', style={ 'color':fg_assessedValue })
                 ], style={ 'margin':'25px', 'padding':'25px', 'border-radius':'10px', 'text-align':'center', 'background-color':bg_assessedValue }),
-                dcc.Graph(id='l_graph2'),
+                dcc.Graph(id='l_graph2', config=dict({'displayModeBar': False})),
             ]),
         ], style={ 'margin':'25px', 'display':'flex', 'flex-direction':'column', 'width':'100%', }),
 
@@ -330,10 +334,11 @@ app.layout = html.Div([
         ], style={}),
             html.Div([
                 html.Div([
-                    html.Div(id='a_text3', style={ 'color':fg_assessedValue })
+                    html.Div("Average Assessement Value", style={ 'margin-bottom':'50px', 'color':fg_assessedValue }),
+                    html.H2(id='a_text3', style={ 'color':fg_assessedValue })
                 ], style={ 'margin':'25px', 'padding':'25px', 'border-radius':'10px', 'text-align':'center',
                            'background-color':bg_assessedValue }),
-                dcc.Graph(id='l_graph3'),
+                dcc.Graph(id='l_graph3', config=dict({'displayModeBar': False})),
             ]),
         ], style={ 'margin':'25px', 'display':'flex', 'flex-direction':'column', 'width':'100%', }),
     ], id='comparison-page-container',

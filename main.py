@@ -97,7 +97,7 @@ app.layout = html.Div([
                 html.Div([
                     html.Div(id='a_text1', style={ 'color':fg_assessedValue }),
                 ], style={ 'margin':'25px', 'padding':'25px', 'border-radius':'10px', 'text-align':'center', 'background-color':bg_assessedValue }),
-                dcc.Graph(id='l_graph1'),
+                dcc.Graph(id='l_graph1', config=dict({'displayModeBar': False})),
             ]),
         ], style={ 'margin':'25px', 'display':'flex', 'flex-direction':'column', 'width':'100%', }),
 
@@ -116,7 +116,7 @@ app.layout = html.Div([
                 html.Div([
                     html.Div(id='a_text2', style={ 'color':fg_assessedValue })
                 ], style={ 'margin':'25px', 'padding':'25px', 'border-radius':'10px', 'text-align':'center', 'background-color':bg_assessedValue }),
-                dcc.Graph(id='l_graph2'),
+                dcc.Graph(id='l_graph2', config=dict({'displayModeBar': False})),
             ]),
         ], style={ 'margin':'25px', 'display':'flex', 'flex-direction':'column', 'width':'100%', }),
 
@@ -135,10 +135,13 @@ app.layout = html.Div([
                 html.Div([
                     html.Div(id='a_text3', style={ 'color':fg_assessedValue })
                 ], style={ 'margin':'25px', 'padding':'25px', 'border-radius':'10px', 'text-align':'center', 'background-color':bg_assessedValue }),
-                dcc.Graph(id='l_graph3'),
+                dcc.Graph(id='l_graph3', config=dict({'displayModeBar': False})),
             ]),
         ], style={ 'margin':'25px', 'display':'flex', 'flex-direction':'column', 'width':'100%', }),
-    ], style={'margin': '25px', 'display': 'flex', 'flex-direction': 'row', })
+    ], style={'margin': '25px', 'display': 'flex', 'flex-direction': 'row', }),
+    html.Br(),
+    html.Br(),
+    html.Br(),
 ])
 
 
