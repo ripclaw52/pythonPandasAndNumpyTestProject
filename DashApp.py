@@ -192,7 +192,7 @@ app.layout = html.Div([
 
                 html.Br(),
                 html.Br(),
-                html.Label('Crime Statistics', style={'color': 'white', 'margin-bottom': 8}),
+                html.Label('Crime Occurrences', style={'color': 'white', 'margin-bottom': 8}),
                 dcc.Dropdown(crimes_list, id='crime_dropdown', multi=True,
                              style={'marginRight': '10px', 'width': 350}),
 
@@ -228,7 +228,7 @@ app.layout = html.Div([
 
             # Filter
             html.Div(children=[
-                html.Label('Greater Edmonton Crime filter',
+                html.Label('Greater Edmonton Crime Filter',
                            style={
                                'color': 'white',
                                'width': 60,
