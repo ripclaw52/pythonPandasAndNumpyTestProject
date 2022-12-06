@@ -447,13 +447,13 @@ def general_crimes(general_crime):
         # title_y=0.8,
         xaxis=dict(
             title='Crime Category Subclass',
-            titlefont_size=10,
-            tickfont_size=8,
+            titlefont_size=13,
+            tickfont_size=11,
         ),
         yaxis=dict(
             title='Occurrences',
-            titlefont_size=10,
-            tickfont_size=8,
+            titlefont_size=13,
+            tickfont_size=11,
         ),
         barmode='group',
         bargap=0.15,  # gap between bars of adjacent location coordinates.
@@ -462,6 +462,7 @@ def general_crimes(general_crime):
     )
     barchart.update_layout(yaxis={'categoryorder': 'total ascending'})
     barchart.update_traces(textposition='outside')
+    barchart.update_layout(title_text=f"{general_crime}" + " Last 90 Days", title_x=0.5)
     return barchart
 
 
@@ -492,13 +493,13 @@ def update_crime_occur_graph(descriptive_crime):
         # title_y=0.8,
         xaxis=dict(
             title='Crime Category',
-            titlefont_size=10,
-            tickfont_size=8,
+            titlefont_size=13,
+            tickfont_size=11,
         ),
         yaxis=dict(
             title='Occurrences',
-            titlefont_size=10,
-            tickfont_size=8,
+            titlefont_size=13,
+            tickfont_size=11,
         ),
         barmode='group',
         bargap=0.15,  # gap between bars of adjacent location coordinates.
@@ -507,6 +508,8 @@ def update_crime_occur_graph(descriptive_crime):
     )
     barchart.update_layout(yaxis={'categoryorder': 'total ascending'})
     barchart.update_traces(textposition='outside')
+    barchart.update_layout(title_text=f"{descriptive_crime}" + " Last 90 Days", title_x=0.5)
+
     return barchart
 
 
@@ -587,7 +590,6 @@ def update_output(neighbourhoodName, assessmentRange, clickData, crime_dropdown)
         columns={'Neighbourhood': 'NeighbourhoodName', 'Neighbourhood ID': 'NeighbourhoodID',
                  'Assessed Value': 'AssessedValue'})
     # print(df_neighbourhood_average_filtered)
-    df_neighbourhood_average_filtered.AssessedValue = df_neighbourhood_average_filtered.AssessedValue.round()
     df_neighbourhood_average_filtered['NeighbourhoodID'] = df_neighbourhood_average_filtered['NeighbourhoodID'].astype(
         int).astype(str)
     # print(df_neighbourhood_average_filtered['NeighbourhoodID'])
@@ -625,8 +627,8 @@ def update_output(neighbourhoodName, assessmentRange, clickData, crime_dropdown)
                                height=538, opacity=0.25,
                                hover_data={'Legend': False, 'AssessedValue': True, 'NeighbourhoodID': True},
                                hover_name='NeighbourhoodName',
-                               color_discrete_map={'Selected Neighbourhood': 'green', 'Clicked Neighbourhood': 'yellow',
-                                                   'Neighbourhoods': 'purple'},
+                               color_discrete_map={'Searched Neighbourhood': 'green',
+                                                   'Selected Neighbourhood': 'yellow', 'Neighbourhoods': 'purple'},
                                custom_data=['NeighbourhoodName', 'AssessedValue', 'Longitude', 'Latitude'],
                                )
 
