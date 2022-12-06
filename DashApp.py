@@ -192,7 +192,7 @@ app.layout = html.Div([
 
                 html.Br(),
                 html.Br(),
-                html.Label('Crime Statistics', style={'color': 'white', 'margin-bottom': 8}),
+                html.Label('Crime Occurrences', style={'color': 'white', 'margin-bottom': 8}),
                 dcc.Dropdown(crimes_list, id='crime_dropdown', multi=True,
                              style={'marginRight': '10px', 'width': 350}),
 
@@ -228,7 +228,7 @@ app.layout = html.Div([
 
             # Filter
             html.Div(children=[
-                html.Label('Greater Edmonton Crime filter',
+                html.Label('Greater Edmonton Crime Filter',
                            style={
                                'color': 'white',
                                'width': 60,
@@ -587,6 +587,7 @@ def update_output(neighbourhoodName, assessmentRange, clickData, crime_dropdown)
         columns={'Neighbourhood': 'NeighbourhoodName', 'Neighbourhood ID': 'NeighbourhoodID',
                  'Assessed Value': 'AssessedValue'})
     # print(df_neighbourhood_average_filtered)
+    df_neighbourhood_average_filtered.AssessedValue = df_neighbourhood_average_filtered.AssessedValue.round()
     df_neighbourhood_average_filtered['NeighbourhoodID'] = df_neighbourhood_average_filtered['NeighbourhoodID'].astype(
         int).astype(str)
     # print(df_neighbourhood_average_filtered['NeighbourhoodID'])
@@ -624,8 +625,8 @@ def update_output(neighbourhoodName, assessmentRange, clickData, crime_dropdown)
                                height=538, opacity=0.25,
                                hover_data={'Legend': False, 'AssessedValue': True, 'NeighbourhoodID': True},
                                hover_name='NeighbourhoodName',
-                               color_discrete_map={'Searched Neighbourhood': 'green',
-                                                   'Selected Neighbourhood': 'yellow', 'Neighbourhoods': 'purple'},
+                               color_discrete_map={'Selected Neighbourhood': 'green', 'Clicked Neighbourhood': 'yellow',
+                                                   'Neighbourhoods': 'purple'},
                                custom_data=['NeighbourhoodName', 'AssessedValue', 'Longitude', 'Latitude'],
                                )
 
