@@ -12,7 +12,7 @@ pd.set_option('display.width', 1000)
 # MAIN PAGE DATAFRAMES AND DATA PREPROCESSING
 # ==================================================================================================================== #
 # CRIMES DATAFRAME
-df_crimes = pd.read_csv('./source-files/Occurrences_Last_90_Days.csv', low_memory=False)
+df_crimes = pd.read_csv('./source-files/Occurrences_CSDP.csv', low_memory=False)
 df_crimes_category = df_crimes.groupby(['Occurrence_Category'], as_index=False).size()
 
 
@@ -61,7 +61,7 @@ languages_list = df_languages.columns.values[4:14]
 
 # ==================================================================================================================== #
 # ASSESSMENT VALUE DATAFRAME
-df_assessments = pd.read_csv('./source-files/Property_Assessment_Data_2022.csv', low_memory=False)
+df_assessments = pd.read_csv("./source-files/Property_Assessment_Data__Current_Calendar_Year_.csv", low_memory=False)
 df_assessments = df_assessments[(df_assessments['Assessment Class 1'] == 'RESIDENTIAL')]
 df_neighbourhood_average = df_assessments.groupby(['Neighbourhood', 'Neighbourhood ID'], as_index=False)[
         ['Assessed Value', 'Latitude', 'Longitude']].mean()
@@ -83,12 +83,8 @@ with open('./source-files/City of Edmonton - Neighbourhoods.geojson', 'r') as f:
 # colours
 bg_assessedValue = "#1C6387"
 fg_assessedValue = "white"
-crime_file = "./source-files/Occurrences_Last_90_Days.csv"
-assessment_file = "./source-files/Property_Assessment_Data__Current_Calendar_Year_.csv"
-languages_file = "./source-files/2016_Census_-_Dwelling_Unit_by_Language__Neighbourhood_Ward_.csv"
 def create_graph_languages(value):
-    df = pd.read_csv(languages_file)
-    dff = df.loc[df['Neighbourhood'] == value]
+    dff = df_languages.loc[df_languages['Neighbourhood'] == value]
     if (len(dff.index) == 0):
         return html.Div(
             html.H3(f"No records found for Neighbourhood: {value.title()}",
@@ -140,8 +136,8 @@ def create_graph_languages(value):
 
 def create_average_assessment(value):
     residential = "RESIDENTIAL"
-    df = pd.read_csv(assessment_file)
-    dff = df.query("`Neighbourhood`==@value & `Assessment Class % 1`==100 & `Assessment Class 1`==@residential")["Assessed Value"]
+    dff = df_assessments["Assessed Value"]
+    #dff = df.query("`Neighbourhood`==@value & `Assessment Class % 1`==100 & `Assessment Class 1`==@residential")["Assessed Value"]
     if (len(dff.index)==0): return "$0.00"
     else:
         average = dff.mean()
@@ -516,7 +512,7 @@ def update_crime_occur_graph(descriptive_crime):
     Output('language_graph', 'figure'),
     Input('Languages_dropdown', 'value'))
 def language_output(language):
-    df_languages = pd.read_csv("./source-files/2016_Census_-_Dwelling_Unit_by_Language__Neighbourhood_Ward_.csv")
+    df_languages = pd.read_csv("./source-files/2016_Census_-_Dwelling_Unit_by_Language__Neighbourhood_Ward_.csv", low_memory=False)
     df_languages_sorted = df_languages.sort_values(by=[language], ascending=False)
 
     df_languages_sorted = df_languages_sorted.head(5)
