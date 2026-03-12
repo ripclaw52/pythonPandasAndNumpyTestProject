@@ -95,19 +95,19 @@ The primary colours chosen within the dashboard are based on the city of Edmonto
 
 Main features implemented into the application include a map outlining the residential neighbourhoods within an assessed value range selected by the user. Included on the map is the location and type of each reported crime grouping. The map chart was used to provide an overview of the city and connect the neighbourhood data to its geographical location. Selection of a specific neighbourhood within the assessed value range through a search bar or directly on the map distinctly outlines the neighbourhood.
 
-![The Assessment Map]("The Assessment Map")
+![The Assessment Map](/assets/dashboard_map.png "The Assessment Map")
 
 Separate from the map a counted listing of the reported crime groups, and selectable sub-groups is displayed with summarized values in two graphs. A radio button selection populates the subgroup selected and displays the statistics of the reported crime group as its subgroups. From that a selection is offered for its subgroups to show its subtype in the populated radio button. A subsequent graph is created displaying the subtypes and listing their numerical count.
 
-![Greater Edmonton Crime Filter]("Greater Edmonton Crime Filter")
+![Greater Edmonton Crime Filter](/assets/dashboard_crime.png "Greater Edmonton Crime Filter")
 
 Beside the crime data is a dropdown selection using the reported languages per household excluding English, non-responses, and what has been defined as other. It displays the data as a horizontal bar graph of the top 5 neighbourhoods, with the number of homes in the neighbourhood listed.
 
-![Non-English Languages per Household in Neighbourhoods]("Non-English Languages per Household in Neighbourhoods")
+![Non-English Languages per Household in Neighbourhoods](/assets/dashboard_language.png "Non-English Languages per Household in Neighbourhoods")
 
 On a separate page is a neighbourhood comparison selection detailing the average assessed value of the neighbourhood and its distribution of languages. This page provides 3 dropdowns listing the neighbourhoods with search functionality and maintains the selected neighbourhood while on the other page.
 
-![Neighbourhoods Average Housing Value and Proportion of Languages]("Neighbourhoods Average Housing Value and Proportion of Languages")
+![Neighbourhoods Average Housing Value and Proportion of Languages](/assets/design_comparison.png "Neighbourhoods Average Housing Value and Proportion of Languages")
 
 <br>
 
