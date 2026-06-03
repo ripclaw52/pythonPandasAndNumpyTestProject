@@ -134,15 +134,15 @@ def create_graph_languages(value):
             )
 
 
-def create_average_assessment(value):
-    residential = "RESIDENTIAL"
-    dff = df_assessments["Assessed Value"]
-    #dff = df.query("`Neighbourhood`==@value & `Assessment Class % 1`==100 & `Assessment Class 1`==@residential")["Assessed Value"]
-    if (len(dff.index)==0): return "$0.00"
-    else:
-        average = dff.mean()
-        currency_string = "${:,.2f}".format(average)
-        return currency_string
+def create_average_assessment(neighbourhood):
+    dff = df_assessments[
+        df_assessments["Neighbourhood"] == neighbourhood
+        ]["Assessed Value"]
+
+    if len(dff) == 0:
+        return "$0.00"
+
+    return f"${dff.mean():,.2f}"
 
 # ==================================================================================================================== #
 # DASH APP INTERFACE SETUP
