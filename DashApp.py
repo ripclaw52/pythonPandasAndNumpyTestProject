@@ -66,8 +66,8 @@ df_assessments = df_assessments[(df_assessments['Assessment Class 1'] == 'RESIDE
 df_neighbourhood_average = df_assessments.groupby(['Neighbourhood', 'Neighbourhood ID'], as_index=False)[
         ['Assessed Value', 'Latitude', 'Longitude']].mean()
 
-min_value = df_neighbourhood_average.min()[1]
-max_value = df_neighbourhood_average.max()[1]
+#min_value = df_neighbourhood_average["Assessed Value"].min()
+#max_value = df_neighbourhood_average["Assessed Value"].max()
 
 neighbourhood_list = df_assessments['Neighbourhood'].unique()
 
@@ -76,6 +76,11 @@ neighbourhood_list = df_assessments['Neighbourhood'].unique()
 # set 'neighbourhood' as a global value to avoid loading same data everytime
 with open('./source-files/City of Edmonton - Neighbourhoods.geojson', 'r') as f:
     neighbourhood = json.load(f)
+
+for feature in neighbourhood["features"]:
+    feature["id"] = int(
+        feature["properties"]["neighbourhood_number"]
+    )
 
 # ==================================================================================================================== #
 # COMPARISON PAGE DATAFRAMES AND SETUP
@@ -611,10 +616,6 @@ def update_output(neighbourhoodName, assessmentRange, clickData, crime_dropdown)
         df_neighbourhood_average_filtered.loc[select_name_filter, 'Legend'] = 'Selected Neighbourhood'
 
     # ================================================================================================================ #
-    i = 0
-    for feature in neighbourhood["features"]:
-        feature['id'] = int(neighbourhood["features"][i]['properties']['neighbourhood_number'])
-        i += 1
 
     fig = px.choropleth_mapbox(df_neighbourhood_average_filtered, geojson=neighbourhood,
                                locations=df_neighbourhood_average_filtered.NeighbourhoodID,
