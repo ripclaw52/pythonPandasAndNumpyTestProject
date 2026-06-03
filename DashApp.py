@@ -512,8 +512,12 @@ def update_crime_occur_graph(descriptive_crime):
     Output('language_graph', 'figure'),
     Input('Languages_dropdown', 'value'))
 def language_output(language):
-    df_languages = pd.read_csv("./source-files/2016_Census_-_Dwelling_Unit_by_Language__Neighbourhood_Ward_.csv", low_memory=False)
-    df_languages_sorted = df_languages.sort_values(by=[language], ascending=False)
+    global df_languages
+
+    df_languages_sorted = df_languages.sort_values(
+        by=[language],
+        ascending=False
+    )
 
     df_languages_sorted = df_languages_sorted.head(5)
     # print(df_languages_sorted)
